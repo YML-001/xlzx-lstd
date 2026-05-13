@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人中心 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#3087CC', light: '#E3F1F9', dark: '#006DAD' },
+            brand: { red: '#DF2027' },
+            success: { DEFAULT: '#1BB975', light: '#E8FCF4' },
+            warning: { DEFAULT: '#F29100', light: '#FFF5E5' },
+            error: { DEFAULT: '#DF2027', light: '#FCE8EA' },
+            txt: { primary: '#3C444F', secondary: '#696F7D', muted: '#9096A2' },
+            placeholder: '#ABB0BA',
+            border: '#C8CAD1',
+            bg: '#FAFAFA',
+            card: '#FFFFFF',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .mobile-frame {
+      width: 375px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #FAFAFA;
+      position: relative;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    @media (min-width: 376px) {
+      body { background: #E8ECF0; }
+      .mobile-frame {
+        margin-top: 24px;
+        margin-bottom: 24px;
+        min-height: calc(100vh - 48px);
+        border-radius: 24px;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.08);
+        overflow: hidden;
+      }
+    }
+    /* 菜单项按压反馈 */
+    .menu-item:active { background: #F5F7FA; }
+    /* 退出按钮按压 */
+    .btn-logout:active { background: #FCE8EA; }
+    /* 底部导航栏固定 */
+    .tab-bar { position: sticky; bottom: 0; z-index: 50; }
+  </style>
+</head>
+<body class="font-sans text-txt-primary">
+
+<div class="mobile-frame">
+  <!-- 顶部导航栏 -->
+  <header class="flex-shrink-0 bg-card h-11 flex items-center px-4 relative border-b border-border/40">
+    <a href="../01-辅导员APP端/app-home-counselor.html" class="flex items-center gap-1.5 text-sm text-txt-secondary no-underline">
+      <i class="fa-solid fa-arrow-left text-xs"></i>
+      <span>返回首页</span>
+    </a>
+    <h1 class="absolute left-1/2 -translate-x-1/2 text-base font-semibold">个人中心</h1>
+  </header>
+
+  <!-- 可滚动内容区 -->
+  <main class="flex-1 overflow-y-auto pb-8">
+
+    <!-- 用户信息卡片 -->
+    <section class="bg-card mx-4 mt-4 rounded-xl shadow-card p-5">
+      <div class="flex items-center">
+        <!-- 头像 -->
+        <div class="w-16 h-16 rounded-full bg-[#E8ECF0] flex items-center justify-center flex-shrink-0">
+          <i class="fa-solid fa-user text-xl text-placeholder"></i>
+        </div>
+        <!-- 用户信息 -->
+        <div class="ml-4 flex-1 min-w-0">
+          <div class="flex items-center gap-2.5 mb-1">
+            <span class="text-base font-semibold text-txt-primary truncate">张老师</span>
+            <span class="inline-flex items-center h-5 px-2 rounded-full text-xs font-medium"
+                  style="background: #E3F1F9; color: #3087CC;">辅导员</span>
+          </div>
+          <p class="text-sm text-txt-secondary truncate">计算机学院</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 功能菜单卡片 -->
+    <section class="bg-card mx-4 mt-3 rounded-xl shadow-card overflow-hidden">
+      <!-- 我的申请 -->
+      <a href="../01-辅导员APP端/app-my-applications.html" class="menu-item flex items-center h-12 px-4 transition-colors duration-150">
+        <i class="fa-regular fa-file-lines text-primary w-5 text-center text-sm"></i>
+        <span class="flex-1 text-sm ml-3">我的申请</span>
+        <span class="inline-flex items-center justify-center h-[18px] min-w-[18px] px-1 rounded-full text-[11px] font-medium text-white"
+              style="background: #3087CC;">12</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-placeholder ml-2.5"></i>
+      </a>
+      <div class="h-px bg-border/40 ml-12"></div>
+
+      <!-- 消息通知 -->
+      <a href="../01-辅导员APP端/app-notifications.html" class="menu-item flex items-center h-12 px-4 transition-colors duration-150">
+        <i class="fa-regular fa-bell text-primary w-5 text-center text-sm"></i>
+        <span class="flex-1 text-sm ml-3">消息通知</span>
+        <span class="w-2 h-2 rounded-full bg-brand-red flex-shrink-0"></span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-placeholder ml-2.5"></i>
+      </a>
+      <div class="h-px bg-border/40 ml-12"></div>
+
+      <!-- 账号设置 -->
+      <a href="#" class="menu-item flex items-center h-12 px-4 transition-colors duration-150">
+        <i class="fa-solid fa-gear text-primary w-5 text-center text-sm"></i>
+        <span class="flex-1 text-sm ml-3">账号设置</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-placeholder"></i>
+      </a>
+      <div class="h-px bg-border/40 ml-12"></div>
+
+      <!-- 修改密码 -->
+      <a href="#" class="menu-item flex items-center h-12 px-4 transition-colors duration-150">
+        <i class="fa-solid fa-key text-primary w-5 text-center text-sm"></i>
+        <span class="flex-1 text-sm ml-3">修改密码</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-placeholder"></i>
+      </a>
+    </section>
+
+    <!-- 第二组菜单 -->
+    <section class="bg-card mx-4 mt-3 rounded-xl shadow-card overflow-hidden">
+      <!-- 帮助中心 -->
+      <a href="#" class="menu-item flex items-center h-12 px-4 transition-colors duration-150">
+        <i class="fa-regular fa-circle-question text-primary w-5 text-center text-sm"></i>
+        <span class="flex-1 text-sm ml-3">帮助中心</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-placeholder"></i>
+      </a>
+      <div class="h-px bg-border/40 ml-12"></div>
+
+      <!-- 关于系统 -->
+      <a href="#" class="menu-item flex items-center h-12 px-4 transition-colors duration-150">
+        <i class="fa-regular fa-circle-info text-primary w-5 text-center text-sm"></i>
+        <span class="flex-1 text-sm ml-3">关于系统</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-placeholder"></i>
+      </a>
+    </section>
+
+    <!-- 退出登录按钮 -->
+    <div class="mx-4 mt-6 mb-4">
+      <button class="btn-logout w-full h-11 rounded-xl border border-brand-red/30 text-brand-red text-sm font-medium bg-card transition-colors duration-150 hover:bg-error-light">
+        退出登录
+      </button>
+    </div>
+
+    <!-- 返回原型导航 -->
+    <div class="text-center pb-6">
+      <a href="../index.html" class="text-xs text-primary hover:underline inline-flex items-center gap-1">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        返回原型导航
+      </a>
+    </div>
+  </main>
+
+</div>
+
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:16px;bottom:16px;z-index:9999;width:36px;height:36px;background:#3087CC;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:14px;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house"></i></a>
+</body>
+</html>

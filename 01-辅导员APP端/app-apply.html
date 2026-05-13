@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>新建就诊申请 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary:      '#3087CC',
+            'primary-light': '#E3F1F9',
+            'primary-dark':  '#006DAD',
+            success:      '#1BB975',
+            'success-bg':   '#E8FCF4',
+            warning:      '#F29100',
+            'warning-bg':   '#FFF5E5',
+            error:        '#DF2027',
+            'error-bg':     '#FCE8EA',
+            'text-primary': '#3C444F',
+            'text-secondary':'#696F7D',
+            'text-muted':   '#9096A2',
+            placeholder:  '#ABB0BA',
+            border:       '#C8CAD1',
+            'page-bg':      '#FAFAFA',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+            top:  '0 -1px 4px rgba(0,0,0,0.06)',
+          },
+          borderRadius: {
+            card: '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { background: #E3F1F9; }
+    body { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #FAFAFA; color: #3C444F; }
+
+    .phone-shell {
+      width: 375px; min-height: 100vh; margin: 0 auto; position: relative;
+      background: #FAFAFA; box-shadow: 0 0 40px rgba(0,0,0,0.12);
+    }
+    @media (min-width: 500px) {
+      html { display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+      .phone-shell { min-height: 812px; border-radius: 32px; overflow: hidden; margin: 20px auto; border: 8px solid #1a1a1a; }
+    }
+    @media (max-width: 499px) {
+      .phone-shell { width: 100%; }
+    }
+
+    /* 表单输入框统一样式 */
+    .form-input {
+      width: 100%; height: 44px; padding: 0 12px;
+      border: 1px solid #C8CAD1; border-radius: 8px;
+      font-size: 14px; color: #3C444F; background: #fff;
+      outline: none; transition: border-color 150ms ease;
+      font-family: inherit;
+    }
+    .form-input::placeholder { color: #ABB0BA; }
+    .form-input:focus { border-color: #3087CC; box-shadow: 0 0 0 2px rgba(48,135,204,0.1); }
+    .form-input:read-only { background: #F1F2F3; color: #9096A2; cursor: default; }
+
+    .form-select {
+      width: 100%; height: 44px; padding: 0 12px;
+      border: 1px solid #C8CAD1; border-radius: 8px;
+      font-size: 14px; color: #3C444F; background: #fff;
+      outline: none; transition: border-color 150ms ease;
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1.5l5 5 5-5' stroke='%239096A2' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      font-family: inherit;
+    }
+    .form-select:focus { border-color: #3087CC; box-shadow: 0 0 0 2px rgba(48,135,204,0.1); }
+
+    .form-textarea {
+      width: 100%; min-height: 100px; padding: 12px;
+      border: 1px solid #C8CAD1; border-radius: 8px;
+      font-size: 14px; color: #3C444F; background: #fff;
+      outline: none; transition: border-color 150ms ease;
+      resize: none; font-family: inherit; line-height: 1.6;
+    }
+    .form-textarea::placeholder { color: #ABB0BA; }
+    .form-textarea:focus { border-color: #3087CC; box-shadow: 0 0 0 2px rgba(48,135,204,0.1); }
+
+    .form-label {
+      display: block; font-size: 14px; color: #3C444F;
+      font-weight: 500; margin-bottom: 6px;
+    }
+    .required::after { content: ' *'; color: #DF2027; }
+
+    /* 单选框 */
+    .radio-group { display: flex; gap: 24px; height: 44px; align-items: center; }
+    .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #3C444F; }
+    .radio-item input[type="radio"] {
+      width: 18px; height: 18px; accent-color: #3087CC; cursor: pointer;
+    }
+
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  </style>
+</head>
+<body>
+  <div class="phone-shell flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <div class="sticky top-0 z-10 bg-white border-b" style="border-color:#E3F1F9;">
+      <div class="h-11 flex items-center px-4 relative" style="margin-top: env(safe-area-inset-top, 40px);">
+        <a href="app-home-counselor.html" class="w-11 h-11 flex items-center justify-center -ml-3 no-underline">
+          <i class="fa-solid fa-arrow-left text-text-primary"></i>
+        </a>
+        <h1 class="absolute left-1/2 -translate-x-1/2 text-base font-bold text-text-primary whitespace-nowrap">新建就诊申请</h1>
+      </div>
+    </div>
+
+    <!-- 表单内容区（可滚动） -->
+    <div class="flex-1 overflow-y-auto pb-[120px]">
+
+      <!-- 区块 1：学生基本信息 -->
+      <div class="mx-4 mt-4 bg-white rounded-card shadow-card p-4">
+        <h2 class="text-[15px] font-bold text-text-primary mb-4 flex items-center gap-2">
+          <span class="w-1 h-4 rounded-full bg-primary inline-block"></span>
+          学生基本信息
+        </h2>
+
+        <div class="space-y-4">
+          <!-- 姓名 -->
+          <div>
+            <label class="form-label required">姓名</label>
+            <input type="text" class="form-input" placeholder="请输入学生姓名">
+          </div>
+
+          <!-- 性别 -->
+          <div>
+            <label class="form-label required">性别</label>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="gender" value="男" checked> 男
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="gender" value="女"> 女
+              </label>
+            </div>
+          </div>
+
+          <!-- 年龄 -->
+          <div>
+            <label class="form-label">年龄</label>
+            <input type="number" class="form-input" placeholder="请输入年龄" min="1" max="99">
+          </div>
+
+          <!-- 学院 -->
+          <div>
+            <label class="form-label required">学院</label>
+            <select class="form-select">
+              <option value="" disabled selected>请选择学院</option>
+              <option>信息科学与工程学院</option>
+              <option>计算机学院</option>
+              <option>外国语学院</option>
+              <option>商学院</option>
+              <option>数学与统计学院</option>
+              <option>物理与电子学院</option>
+              <option>化学化工学院</option>
+              <option>文学与新闻传播学院</option>
+            </select>
+          </div>
+
+          <!-- 年级 -->
+          <div>
+            <label class="form-label required">年级</label>
+            <select class="form-select">
+              <option value="" disabled selected>请选择年级</option>
+              <option>大一</option>
+              <option>大二</option>
+              <option>大三</option>
+              <option>大四</option>
+              <option>研一</option>
+              <option>研二</option>
+              <option>研三</option>
+              <option>博士</option>
+            </select>
+          </div>
+
+          <!-- 身份证号 -->
+          <div>
+            <label class="form-label">身份证号</label>
+            <input type="text" class="form-input" placeholder="请输入18位身份证号" maxlength="18" inputmode="numeric">
+          </div>
+
+          <!-- 联系方式 -->
+          <div>
+            <label class="form-label required">联系方式</label>
+            <input type="tel" class="form-input" placeholder="请输入手机号码" maxlength="11" inputmode="tel">
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 2：辅导员信息 -->
+      <div class="mx-4 mt-4 bg-white rounded-card shadow-card p-4">
+        <h2 class="text-[15px] font-bold text-text-primary mb-4 flex items-center gap-2">
+          <span class="w-1 h-4 rounded-full bg-primary inline-block"></span>
+          辅导员信息
+        </h2>
+
+        <div class="space-y-4">
+          <!-- 就诊类型 -->
+          <div>
+            <label class="form-label required flex items-center gap-1">
+              就诊类型
+              <i class="fa-regular fa-circle-question text-xs text-text-muted" title="首诊：首次到心理中心就诊；复诊：之前已有就诊记录"></i>
+            </label>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="visit_type" value="首诊" checked> 首诊
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="visit_type" value="复诊"> 复诊
+              </label>
+            </div>
+          </div>
+
+          <!-- 辅导员姓名 -->
+          <div>
+            <label class="form-label">辅导员姓名</label>
+            <input type="text" class="form-input" value="张老师" readonly>
+          </div>
+
+          <!-- 辅导员联系方式 -->
+          <div>
+            <label class="form-label">辅导员联系方式</label>
+            <input type="text" class="form-input" value="138****5678" readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- 区块 3：学生情况说明 -->
+      <div class="mx-4 mt-4 bg-white rounded-card shadow-card p-4">
+        <h2 class="text-[15px] font-bold text-text-primary mb-4 flex items-center gap-2">
+          <span class="w-1 h-4 rounded-full bg-primary inline-block"></span>
+          学生情况说明
+        </h2>
+
+        <div>
+          <textarea class="form-textarea" maxlength="150" placeholder="请描述学生的情况..."
+                    oninput="document.getElementById('charCount').textContent = this.value.length"></textarea>
+          <div class="flex items-center justify-between mt-2">
+            <p class="text-xs text-text-muted leading-relaxed flex-1 mr-4">请用最精简的语言描述学生症状表现，可包括学生主诉及他人观察</p>
+            <span class="text-xs text-text-muted whitespace-nowrap"><span id="charCount">0</span>/150</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 注意事项 -->
+      <div class="mx-4 mt-4 p-3 rounded-card" style="background: #FFF5E5; border: 1px solid #FFE0B3;">
+        <div class="flex gap-2">
+          <i class="fa-solid fa-triangle-exclamation text-warning text-sm mt-0.5 shrink-0"></i>
+          <div class="text-xs text-text-secondary leading-relaxed">
+            <p class="font-medium text-warning mb-1">注意事项</p>
+            <p>① 就诊务必携带就诊人身份证</p>
+            <p>② 复诊学生务必携带之前就诊的病历资料</p>
+            <p>③ 学生就诊、送医务必遵守相关法律法规</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 返回原型导航 -->
+      <div class="px-4 mt-4 mb-4">
+        <a href="../index.html" class="inline-flex items-center gap-1.5 text-sm text-text-muted no-underline hover:text-primary transition-colors">
+          <i class="fa-solid fa-arrow-left text-xs"></i>
+          <span>返回原型导航</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 底部固定提交按钮 -->
+    <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-[375px] bg-white px-4 pt-3 safe-bottom"
+         style="box-shadow: 0 -1px 4px rgba(0,0,0,0.06); padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));">
+      <button type="button" onclick="handleSubmit()"
+              class="w-full h-11 rounded-card bg-primary text-white font-medium text-base
+                     hover:bg-primary-dark active:opacity-90 transition-all duration-150
+                     flex items-center justify-center gap-2">
+        提交申请
+      </button>
+    </div>
+
+  </div>
+
+  <style>
+    @media (min-width: 500px) {
+      .fixed.bottom-0 { position: absolute; }
+      .sticky { position: absolute; width: 100%; }
+      .phone-shell { overflow-y: auto; }
+      .phone-shell > .flex-1 { padding-top: 84px; }
+    }
+  </style>
+
+  <script>
+    function handleSubmit() {
+      const btn = event.currentTarget;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 提交中...';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+      setTimeout(() => {
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> 提交成功';
+        btn.style.background = '#1BB975';
+        setTimeout(() => {
+          window.location.href = 'app-home-counselor.html';
+        }, 800);
+      }, 1200);
+    }
+  </script>
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:16px;bottom:16px;z-index:9999;width:36px;height:36px;background:#3087CC;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:14px;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house"></i></a>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>审批详情 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary:      '#3087CC',
+            'primary-light': '#E3F1F9',
+            'primary-dark':  '#006DAD',
+            success:      '#1BB975',
+            'success-bg':   '#E8FCF4',
+            'success-border':'#A7F3D0',
+            warning:      '#F29100',
+            'warning-bg':   '#FFF5E5',
+            'warning-border':'#FFE0B3',
+            error:        '#DF2027',
+            'error-bg':     '#FCE8EA',
+            'error-border':  '#F6BCBE',
+            'text-primary': '#3C444F',
+            'text-secondary':'#696F7D',
+            'text-muted':   '#9096A2',
+            placeholder:  '#ABB0BA',
+            border:       '#C8CAD1',
+            'page-bg':      '#FAFAFA',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+            top:  '0 -1px 4px rgba(0,0,0,0.06)',
+          },
+          borderRadius: {
+            card: '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { background: #E3F1F9; }
+    body { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #FAFAFA; color: #3C444F; }
+
+    .phone-shell {
+      width: 375px; min-height: 100vh; margin: 0 auto; position: relative;
+      background: #FAFAFA; box-shadow: 0 0 40px rgba(0,0,0,0.12);
+    }
+    @media (min-width: 500px) {
+      html { display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+      .phone-shell { min-height: 812px; border-radius: 32px; overflow: hidden; margin: 20px auto; border: 8px solid #1a1a1a; }
+    }
+    @media (max-width: 499px) {
+      .phone-shell { width: 100%; }
+    }
+
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+    .info-row { display: flex; padding: 10px 0; border-bottom: 1px solid #F0F1F3; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { width: 80px; flex-shrink: 0; font-size: 13px; color: #9096A2; }
+    .info-value { flex: 1; font-size: 13px; color: #3C444F; }
+
+    .radio-option { transition: all 150ms ease; cursor: pointer; }
+    .radio-option:active { transform: scale(0.98); }
+    .radio-option.selected { border-color: #3087CC; background: #E3F1F9; }
+    .radio-option.selected .radio-dot { border-color: #3087CC; }
+    .radio-option.selected .radio-dot::after { content: ''; display: block; width: 10px; height: 10px; background: #3087CC; border-radius: 50%; }
+
+    .form-section { max-height: 0; overflow: hidden; opacity: 0; transition: max-height 300ms ease, opacity 200ms ease, margin 200ms ease; margin-top: 0; }
+    .form-section.visible { max-height: 200px; opacity: 1; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="phone-shell flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <div class="bg-white px-4 pt-12 pb-3 flex items-center border-b" style="border-color:#E3F1F9;">
+      <a href="app-pending-review.html" class="flex items-center gap-2 no-underline text-text-primary">
+        <i class="fa-solid fa-arrow-left text-sm"></i>
+        <span class="text-base font-bold">审批详情</span>
+      </a>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="flex-1 overflow-y-auto pb-[100px]">
+
+      <!-- 状态徽章 -->
+      <div class="px-4 pt-4">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border"
+              style="color:#F29100; background:#FFF5E5; border-color:#FFE0B3;">
+          <i class="fa-solid fa-clock text-xs mr-1.5"></i>待审核
+        </span>
+      </div>
+
+      <!-- 学生信息卡片 -->
+      <div class="px-4 mt-4">
+        <div class="bg-white rounded-card shadow-card p-4">
+          <h3 class="text-sm font-bold text-text-primary mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-user text-primary text-xs"></i>学生信息
+          </h3>
+          <div>
+            <div class="info-row">
+              <span class="info-label">姓名</span>
+              <span class="info-value font-medium">李明</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">性别</span>
+              <span class="info-value">男</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">年龄</span>
+              <span class="info-value">21</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">学院</span>
+              <span class="info-value">信息科学与工程学院</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">年级</span>
+              <span class="info-value">大三</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">联系方式</span>
+              <span class="info-value">188****6789</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">身份证号</span>
+              <span class="info-value">430****XXXX****1234</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 辅导员信息 -->
+      <div class="px-4 mt-3">
+        <div class="bg-white rounded-card shadow-card p-4">
+          <h3 class="text-sm font-bold text-text-primary mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-user-tie text-primary text-xs"></i>提交信息
+          </h3>
+          <div>
+            <div class="info-row">
+              <span class="info-label">就诊类型</span>
+              <span class="info-value">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" style="color:#3087CC; background:#E3F1F9;">首诊</span>
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">辅导员</span>
+              <span class="info-value">张老师</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">联系方式</span>
+              <span class="info-value">138****5678</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 情况描述 -->
+      <div class="px-4 mt-3">
+        <div class="bg-white rounded-card shadow-card p-4">
+          <h3 class="text-sm font-bold text-text-primary mb-2 flex items-center gap-2">
+            <i class="fa-solid fa-file-lines text-primary text-xs"></i>情况描述
+          </h3>
+          <p class="text-sm text-text-secondary leading-relaxed">
+            该生近两周出现明显焦虑情绪，伴有失眠和注意力不集中，自述学业压力较大，情绪波动明显，有时会出现心慌症状。
+          </p>
+        </div>
+      </div>
+
+      <!-- 分割线 -->
+      <div class="mx-4 my-4 h-px bg-border/40"></div>
+
+      <!-- 审批操作 -->
+      <div class="px-4">
+        <div class="bg-white rounded-card shadow-card p-4">
+          <h3 class="text-sm font-bold text-text-primary mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-stamp text-primary text-xs"></i>审批操作
+          </h3>
+
+          <!-- 选项 -->
+          <div class="flex gap-3">
+            <div class="radio-option flex-1 flex items-center gap-2.5 p-3 rounded-card border border-border" onclick="selectAction('approve')">
+              <div class="radio-dot w-[18px] h-[18px] rounded-full border-2 border-border flex items-center justify-center flex-shrink-0"></div>
+              <span class="text-sm font-medium text-text-primary">通过</span>
+            </div>
+            <div class="radio-option flex-1 flex items-center gap-2.5 p-3 rounded-card border border-border" onclick="selectAction('reject')">
+              <div class="radio-dot w-[18px] h-[18px] rounded-full border-2 border-border flex items-center justify-center flex-shrink-0"></div>
+              <span class="text-sm font-medium text-text-primary">驳回</span>
+            </div>
+          </div>
+
+          <!-- 通过：编号输入 -->
+          <div id="approveForm" class="form-section">
+            <label class="block text-sm text-text-secondary mb-2">编号 <span class="text-error">*</span></label>
+            <input type="text" placeholder="请输入编号，如：024"
+                   class="w-full h-10 px-3 rounded-card border border-border text-sm text-text-primary outline-none placeholder:text-placeholder focus:border-primary transition-colors">
+          </div>
+
+          <!-- 驳回：原因输入 -->
+          <div id="rejectForm" class="form-section">
+            <label class="block text-sm text-text-secondary mb-2">驳回原因 <span class="text-error">*</span></label>
+            <textarea placeholder="请填写驳回原因" rows="3"
+                      class="w-full px-3 py-2.5 rounded-card border border-border text-sm text-text-primary outline-none placeholder:text-placeholder focus:border-primary transition-colors resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- 返回原型导航 -->
+      <div class="px-4 mt-6 mb-4">
+        <a href="../index.html" class="inline-flex items-center gap-1.5 text-sm text-text-muted no-underline hover:text-primary transition-colors">
+          <i class="fa-solid fa-arrow-left text-xs"></i>
+          <span>返回原型导航</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- 底部操作栏 -->
+    <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-[375px] bg-white border-t px-4 py-3 safe-bottom"
+         style="border-color: #E3F1F9; box-shadow: 0 -1px 4px rgba(0,0,0,0.06);">
+      <div class="flex gap-3">
+        <button onclick="handleReject()" class="flex-1 h-11 rounded-card border-2 text-sm font-medium transition-all active:scale-[0.97]"
+                style="border-color:#DF2027; color:#DF2027; background:#fff;">
+          <i class="fa-solid fa-xmark mr-1"></i>驳回
+        </button>
+        <button onclick="handleApprove()" class="flex-1 h-11 rounded-card text-sm font-medium text-white transition-all active:scale-[0.97]"
+                style="background:#1BB975;">
+          <i class="fa-solid fa-check mr-1"></i>通过
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <style>
+    @media (min-width: 500px) {
+      .fixed.bottom-0 { position: absolute; }
+    }
+  </style>
+
+  <script>
+    var currentAction = '';
+
+    function selectAction(action) {
+      currentAction = action;
+      document.querySelectorAll('.radio-option').forEach(function(el) {
+        el.classList.remove('selected');
+        var dot = el.querySelector('.radio-dot');
+        dot.style.borderColor = '#C8CAD1';
+        dot.innerHTML = '';
+      });
+
+      var options = document.querySelectorAll('.radio-option');
+      var target = action === 'approve' ? options[0] : options[1];
+      target.classList.add('selected');
+      var dot = target.querySelector('.radio-dot');
+      dot.style.borderColor = '#3087CC';
+      dot.innerHTML = '<div style="width:10px;height:10px;background:#3087CC;border-radius:50%;"></div>';
+
+      var approveForm = document.getElementById('approveForm');
+      var rejectForm = document.getElementById('rejectForm');
+
+      if (action === 'approve') {
+        approveForm.classList.add('visible');
+        rejectForm.classList.remove('visible');
+      } else {
+        rejectForm.classList.add('visible');
+        approveForm.classList.remove('visible');
+      }
+    }
+
+    function handleApprove() {
+      selectAction('approve');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function handleReject() {
+      selectAction('reject');
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  </script>
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:16px;bottom:16px;z-index:9999;width:36px;height:36px;background:#3087CC;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:14px;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house"></i></a>
+</body>
+</html>

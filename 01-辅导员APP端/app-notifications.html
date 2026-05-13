@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>消息通知 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#3087CC', light: '#E3F1F9', dark: '#006DAD' },
+            brand: { red: '#DF2027' },
+            success: { DEFAULT: '#1BB975', light: '#E8FCF4' },
+            warning: { DEFAULT: '#F29100', light: '#FFF5E5' },
+            error: { DEFAULT: '#DF2027', light: '#FCE8EA' },
+            txt: { primary: '#3C444F', secondary: '#696F7D', muted: '#9096A2' },
+            placeholder: '#ABB0BA',
+            border: '#C8CAD1',
+            bg: '#FAFAFA',
+            card: '#FFFFFF',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+            frame: '0 0 0 1px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.08)',
+          },
+          borderRadius: {
+            DEFAULT: '8px',
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .mobile-frame {
+      width: 375px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #FAFAFA;
+      position: relative;
+      overflow-x: hidden;
+    }
+    @media (min-width: 376px) {
+      body { background: #E8ECF0; }
+      .mobile-frame {
+        margin-top: 24px;
+        margin-bottom: 24px;
+        min-height: calc(100vh - 48px);
+        border-radius: 24px;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.08);
+        overflow: hidden;
+      }
+    }
+    .tab-pill {
+      padding: 6px 16px;
+      font-size: 13px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      color: #696F7D;
+      background: #FFFFFF;
+      border: 1px solid #C8CAD1;
+    }
+    .tab-pill.active {
+      color: #FFFFFF;
+      background: #3087CC;
+      border-color: #3087CC;
+    }
+    .tab-pill:not(.active):hover {
+      border-color: #3087CC;
+      color: #3087CC;
+    }
+    .notif-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #FFFFFF;
+      border-bottom: 1px solid #F0F0F2;
+      cursor: pointer;
+      transition: background 0.15s;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+    }
+    .notif-item:hover { background: #F8FAFC; }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-dot {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #3087CC;
+    }
+    .notif-item.unread { padding-left: 22px; }
+    .notif-item.unread .notif-title { font-weight: 600; }
+    .notif-item.unread .notif-desc { color: #3C444F; }
+  </style>
+</head>
+<body class="font-sans text-txt-primary">
+
+<div class="mobile-frame flex flex-col">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-white border-b border-border flex items-center h-11 px-4 flex-shrink-0">
+    <a href="app-home-counselor.html" class="flex items-center gap-1 text-txt-primary text-sm">
+      <i class="fa-solid fa-chevron-left text-xs"></i>
+    </a>
+    <span class="flex-1 text-center text-[15px] font-semibold">消息通知</span>
+    <button class="text-primary text-[13px] font-medium" onclick="markAllRead()">全部已读</button>
+  </header>
+
+  <!-- Tab pills -->
+  <div class="flex gap-2 px-4 py-3 bg-white flex-shrink-0">
+    <span class="tab-pill active" onclick="switchTab(this)">全部</span>
+    <span class="tab-pill" onclick="switchTab(this)">审批通知</span>
+    <span class="tab-pill" onclick="switchTab(this)">系统消息</span>
+  </div>
+
+  <!-- Notification list -->
+  <div class="flex-1 overflow-y-auto pb-6">
+    <div class="bg-white rounded-lg mx-4 mt-2 shadow-card overflow-hidden">
+
+      <!-- 1. Unread - 申请已通过 -->
+      <a href="#" class="notif-item unread">
+        <div class="notif-dot"></div>
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: #E8FCF4;">
+          <i class="fa-solid fa-circle-check text-success text-base"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-1">
+            <span class="notif-title text-sm text-txt-primary font-semibold">申请已通过</span>
+            <span class="text-xs text-txt-muted flex-shrink-0 ml-2">2小时前</span>
+          </div>
+          <p class="notif-desc text-[13px] text-txt-primary leading-relaxed line-clamp-2">您为学生王华提交的就诊申请已通过审批，编号：第023号</p>
+        </div>
+      </a>
+
+      <!-- 2. Unread - 申请被驳回 -->
+      <a href="#" class="notif-item unread">
+        <div class="notif-dot"></div>
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: #FCE8EA;">
+          <i class="fa-solid fa-circle-xmark text-error text-base"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-1">
+            <span class="notif-title text-sm text-txt-primary font-semibold">申请被驳回</span>
+            <span class="text-xs text-txt-muted flex-shrink-0 ml-2">5小时前</span>
+          </div>
+          <p class="notif-desc text-[13px] text-txt-primary leading-relaxed line-clamp-2">您为学生陈静提交的就诊申请被驳回，请查看原因并修改</p>
+        </div>
+      </a>
+
+      <!-- 3. Read - 申请已受理 -->
+      <a href="#" class="notif-item">
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: #FFF5E5;">
+          <i class="fa-solid fa-clock text-warning text-base"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-1">
+            <span class="notif-title text-sm text-txt-primary">申请已受理</span>
+            <span class="text-xs text-txt-muted flex-shrink-0 ml-2">1天前</span>
+          </div>
+          <p class="notif-desc text-[13px] text-txt-secondary leading-relaxed line-clamp-2">您为学生李明提交的就诊申请已被受理，请等待审批</p>
+        </div>
+      </a>
+
+      <!-- 4. Read - 系统通知 -->
+      <a href="#" class="notif-item">
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: #E3F1F9;">
+          <i class="fa-solid fa-bullhorn text-primary text-base"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-1">
+            <span class="notif-title text-sm text-txt-primary">系统通知</span>
+            <span class="text-xs text-txt-muted flex-shrink-0 ml-2">3天前</span>
+          </div>
+          <p class="notif-desc text-[13px] text-txt-secondary leading-relaxed line-clamp-2">绿色通道系统已更新，新增批量导出功能</p>
+        </div>
+      </a>
+
+      <!-- 5. Read - 申请已通过 -->
+      <a href="#" class="notif-item">
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: #E8FCF4;">
+          <i class="fa-solid fa-circle-check text-success text-base"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-1">
+            <span class="notif-title text-sm text-txt-primary">申请已通过</span>
+            <span class="text-xs text-txt-muted flex-shrink-0 ml-2">5天前</span>
+          </div>
+          <p class="notif-desc text-[13px] text-txt-secondary leading-relaxed line-clamp-2">您为学生刘洋提交的就诊申请已通过审批，编号：第022号</p>
+        </div>
+      </a>
+
+      <!-- 6. Read - 系统维护 -->
+      <a href="#" class="notif-item">
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center" style="background: #F3F4F6;">
+          <i class="fa-solid fa-gear text-txt-muted text-base"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between mb-1">
+            <span class="notif-title text-sm text-txt-primary">系统维护</span>
+            <span class="text-xs text-txt-muted flex-shrink-0 ml-2">1周前</span>
+          </div>
+          <p class="notif-desc text-[13px] text-txt-secondary leading-relaxed line-clamp-2">系统将于本周六进行例行维护，届时可能短暂无法访问</p>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Back to nav -->
+    <div class="text-center py-6">
+      <a href="../index.html" class="text-xs text-primary hover:underline inline-flex items-center gap-1">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        返回原型导航
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(el) {
+    document.querySelectorAll('.tab-pill').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  function markAllRead() {
+    document.querySelectorAll('.notif-item.unread').forEach(item => {
+      item.classList.remove('unread');
+      const dot = item.querySelector('.notif-dot');
+      if (dot) dot.remove();
+    });
+  }
+</script>
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:16px;bottom:16px;z-index:9999;width:36px;height:36px;background:#3087CC;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:14px;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house"></i></a>
+</body>
+</html>

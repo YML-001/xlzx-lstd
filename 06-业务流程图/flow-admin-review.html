@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理员审批流程 — 心理中心绿色通道</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: OPPOSans, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #FAFAFA; color: #3C444F; line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page-wrapper { max-width: 920px; margin: 0 auto; padding: 40px 24px 60px; }
+  .breadcrumb { font-size: 13px; color: #9096A2; margin-bottom: 28px; }
+  .breadcrumb a { color: #3087CC; text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb span { margin: 0 6px; }
+  .page-title { font-size: 26px; font-weight: 700; color: #3C444F; margin-bottom: 6px; }
+  .page-subtitle { font-size: 14px; color: #696F7D; margin-bottom: 40px; }
+
+  .flow-container { display: flex; flex-direction: column; align-items: center; overflow-x: auto; padding-bottom: 20px; }
+  .flow-main { display: flex; flex-direction: column; align-items: center; min-width: 620px; }
+
+  .node {
+    position: relative; display: flex; align-items: center; gap: 14px;
+    padding: 16px 24px; border-radius: 12px; background: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); border: 1px solid #C8CAD1;
+    min-width: 280px; max-width: 340px; text-align: left; z-index: 2;
+  }
+  .node .icon {
+    font-size: 20px; flex-shrink: 0; width: 36px; height: 36px;
+    border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  }
+  .node .label { font-size: 15px; font-weight: 600; color: #3C444F; }
+  .node .sub { font-size: 12px; color: #9096A2; margin-top: 2px; }
+
+  .node.start, .node.end {
+    background: linear-gradient(135deg, #3087CC, #006DAD); color: #fff;
+    border: none; justify-content: center; text-align: center;
+  }
+  .node.start .icon, .node.end .icon { background: rgba(255,255,255,0.2); color: #fff; }
+  .node.start .label, .node.end .label { color: #fff; }
+  .node.start .sub, .node.end .sub { color: rgba(255,255,255,0.8); }
+
+  .node.process { border-left: 4px solid #3087CC; }
+  .node.process .icon { background: #E3F1F9; color: #3087CC; }
+  .node.process.red { border-left-color: #DF2027; }
+  .node.process.red .icon { background: #FCE8EA; color: #DF2027; }
+  .node.process.green { border-left-color: #1BB975; }
+  .node.process.green .icon { background: #E8FCF4; color: #1BB975; }
+
+  .node.decision {
+    background: linear-gradient(135deg, #FFF5E5, #FFF0D6); border: 2px solid #F29100;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    width: 180px; height: 180px; min-width: auto; max-width: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 30px; gap: 4px;
+  }
+  .node.decision .icon { background: rgba(242,145,0,0.15); color: #F29100; margin-bottom: 2px; }
+  .node.decision .label { font-size: 14px; }
+
+  .connector {
+    width: 2px; height: 36px; background: #C8CAD1; position: relative;
+  }
+  .connector::after {
+    content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    border-left: 6px solid transparent; border-right: 6px solid transparent;
+    border-top: 7px solid #C8CAD1;
+  }
+
+  .branch-area { display: flex; align-items: flex-start; gap: 80px; position: relative; }
+  .branch-area::before {
+    content: ''; position: absolute; top: 0; left: 50%;
+    transform: translateX(-50%); width: calc(100% - 160px); height: 2px; background: #C8CAD1;
+  }
+  .branch { display: flex; flex-direction: column; align-items: center; }
+  .branch-label {
+    font-size: 12px; font-weight: 600; padding: 3px 12px; border-radius: 20px;
+    margin-bottom: 8px; position: relative; z-index: 2;
+  }
+  .branch-label.reject { background: #FCE8EA; color: #DF2027; }
+  .branch-label.approve { background: #E8FCF4; color: #1BB975; }
+
+  .branch .connector-h {
+    width: 2px; height: 24px; background: #C8CAD1; position: relative;
+  }
+  .branch .connector-h::after {
+    content: ''; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%);
+    border-left: 6px solid transparent; border-right: 6px solid transparent;
+    border-top: 7px solid #C8CAD1;
+  }
+
+  /* Merge connector */
+  .merge-area { position: relative; width: 100%; display: flex; justify-content: center; padding-top: 20px; }
+
+  .flow-footer { margin-top: 48px; text-align: center; }
+  .other-flows { font-size: 13px; color: #696F7D; margin-bottom: 16px; }
+  .other-flows a { color: #3087CC; text-decoration: none; margin: 0 8px; }
+  .other-flows a:hover { text-decoration: underline; }
+  .btn-home {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 28px; border-radius: 8px; font-size: 14px; font-weight: 600;
+    background: #3087CC; color: #fff; text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06); transition: background .2s;
+  }
+  .btn-home:hover { background: #006DAD; }
+
+  @media print {
+    body { background: #fff; }
+    .btn-home, .flow-footer { display: none; }
+  }
+  @media (max-width: 640px) {
+    .page-wrapper { padding: 24px 12px 40px; }
+    .flow-container { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+  <div class="breadcrumb">
+    <a href="../index.html">原型首页</a><span>/</span>
+    <a href="#">业务流程</a><span>/</span>管理员审批流程
+  </div>
+  <h1 class="page-title">管理员审批流程</h1>
+  <p class="page-subtitle">心理中心管理员审核绿色通道就诊申请的操作流程</p>
+
+  <div class="flow-container">
+    <div class="flow-main">
+
+      <!-- 1. START -->
+      <div class="node start">
+        <div class="icon"><i class="fa-solid fa-bell"></i></div>
+        <div><div class="label">收到新申请通知</div><div class="sub">APP推送 / 系统消息</div></div>
+      </div>
+      <div class="connector"></div>
+
+      <!-- 2 -->
+      <div class="node process">
+        <div class="icon"><i class="fa-solid fa-list-check"></i></div>
+        <div><div class="label">进入审批列表</div><div class="sub">查看待审批申请</div></div>
+      </div>
+      <div class="connector"></div>
+
+      <!-- 3 -->
+      <div class="node process">
+        <div class="icon"><i class="fa-solid fa-file-lines"></i></div>
+        <div><div class="label">查看申请详情</div><div class="sub">学生信息、就诊类型、辅导员说明</div></div>
+      </div>
+      <div class="connector"></div>
+
+      <!-- 4 -->
+      <div class="node process">
+        <div class="icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <div><div class="label">核实申请信息</div><div class="sub">确认信息完整性和准确性</div></div>
+      </div>
+      <div class="connector"></div>
+
+      <!-- 5 DECISION -->
+      <div class="node decision">
+        <div class="icon"><i class="fa-solid fa-code-branch"></i></div>
+        <div class="label">审批决定？</div>
+      </div>
+
+      <div style="height:20px;"></div>
+
+      <!-- Branches -->
+      <div class="branch-area">
+        <!-- Left: 驳回 -->
+        <div class="branch">
+          <div class="branch-label reject">驳回</div>
+          <div class="connector-h"></div>
+          <div class="node process red">
+            <div class="icon"><i class="fa-solid fa-comment-dots"></i></div>
+            <div><div class="label">填写驳回原因</div><div class="sub">说明需要补充/修改的内容</div></div>
+          </div>
+          <div class="connector-h"></div>
+          <div class="node process red">
+            <div class="icon"><i class="fa-solid fa-paper-plane"></i></div>
+            <div><div class="label">系统通知辅导员</div><div class="sub">消息推送 + 站内信</div></div>
+          </div>
+          <div class="connector-h"></div>
+        </div>
+
+        <!-- Right: 通过 -->
+        <div class="branch">
+          <div class="branch-label approve">通过</div>
+          <div class="connector-h"></div>
+          <div class="node process green">
+            <div class="icon"><i class="fa-solid fa-hashtag"></i></div>
+            <div><div class="label">填写就诊编号</div><div class="sub">系统生成或手动输入</div></div>
+          </div>
+          <div class="connector-h"></div>
+          <div class="node process green">
+            <div class="icon"><i class="fa-solid fa-stamp"></i></div>
+            <div><div class="label">确认通过</div></div>
+          </div>
+          <div class="connector-h"></div>
+          <div class="node process green">
+            <div class="icon"><i class="fa-solid fa-paper-plane"></i></div>
+            <div><div class="label">系统通知辅导员</div><div class="sub">通过通知 + 编号信息</div></div>
+          </div>
+          <div class="connector-h"></div>
+          <div class="node process green">
+            <div class="icon"><i class="fa-solid fa-file-export"></i></div>
+            <div><div class="label">可导出申请表</div><div class="sub">单独导出或批量导出</div></div>
+          </div>
+          <div class="connector-h"></div>
+        </div>
+      </div>
+
+      <div class="connector"></div>
+
+      <!-- END -->
+      <div class="node end" style="background:linear-gradient(135deg,#1BB975,#14956A);">
+        <div class="icon"><i class="fa-solid fa-flag-checkered"></i></div>
+        <div><div class="label">审批完成</div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="flow-footer">
+    <div class="other-flows">
+      查看其他流程：
+      <a href="flow-counselor-apply.html"><i class="fa-solid fa-user-pen"></i> 辅导员申请流程</a>
+      <a href="flow-export.html"><i class="fa-solid fa-file-export"></i> 数据导出流程</a>
+    </div>
+    <a href="../index.html" class="btn-home"><i class="fa-solid fa-arrow-left"></i> 返回原型首页</a>
+  </div>
+</div>
+</body>
+</html>

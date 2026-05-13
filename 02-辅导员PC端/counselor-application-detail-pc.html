@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>申请详情 - 辅导员端 · 心理中心绿色通道</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @font-face { font-family: 'OPPOSans'; src: local('OPPOSans'); }
+        * { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; box-sizing: border-box; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 240px; min-height: 100vh;
+            background: #fff; border-right: 1px solid #C8CAD1;
+            position: fixed; top: 0; left: 0; z-index: 50;
+            display: flex; flex-direction: column; transition: transform 0.3s;
+        }
+        .sidebar-logo   { padding: 20px 20px 16px; border-bottom: 1px solid #f0f0f0; }
+        .sidebar-nav    { flex: 1; padding: 16px 12px; overflow-y: auto; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 16px; border-radius: 8px;
+            color: #696F7D; font-size: 14px; text-decoration: none;
+            margin-bottom: 4px; transition: all 0.2s;
+        }
+        .nav-item:hover  { background: #E3F1F9; color: #3087CC; }
+        .nav-item.active { background: #E3F1F9; color: #3087CC; font-weight: 600; }
+        .nav-item i      { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+        .nav-badge {
+            margin-left: auto; background: #DF2027; color: #fff;
+            font-size: 11px; font-weight: 700; min-width: 18px; height: 18px;
+            border-radius: 9px; display: flex; align-items: center;
+            justify-content: center; padding: 0 5px;
+        }
+
+        /* ── Main ── */
+        .main-content { margin-left: 240px; min-height: 100vh; background: #FAFAFA; }
+
+        /* ── Cards ── */
+        .card { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+        /* ── Info grid ── */
+        .info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .info-item {
+            padding: 13px 16px; border-bottom: 1px solid #F1F5F9;
+            display: flex; flex-direction: column; gap: 3px;
+        }
+        .info-item:nth-last-child(-n+2) { border-bottom: none; }
+        .info-label { font-size: 12px; color: #9096A2; }
+        .info-value { font-size: 14px; color: #3C444F; font-weight: 500; }
+
+        /* ── Section heading ── */
+        .sect-head {
+            display: flex; align-items: center; gap: 8px;
+            padding: 14px 16px 12px; border-bottom: 1px solid #F1F5F9;
+        }
+        .sect-head-bar { width: 3px; height: 14px; background: #3087CC; border-radius: 2px; }
+        .sect-head-text { font-size: 13px; font-weight: 600; color: #3C444F; }
+
+        /* ── Badges ── */
+        .badge-lg {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 18px; border-radius: 20px; font-size: 15px; font-weight: 700;
+        }
+        .badge-lg.approved { background: #E8FCF4; color: #1BB975; }
+        .badge-lg.pending  { background: #FFF5E5; color: #F29100; }
+        .badge-lg.rejected { background: #FCE8EA; color: #DF2027; }
+
+        .badge-sm {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 10px; border-radius: 12px; font-size: 12px; font-weight: 500;
+        }
+        .badge-sm.blue { background: #E3F1F9; color: #3087CC; }
+
+        /* ── Timeline ── */
+        .timeline { padding: 16px 20px; }
+        .tl-item { display: flex; gap: 14px; position: relative; padding-bottom: 22px; }
+        .tl-item:last-child { padding-bottom: 0; }
+        .tl-item:not(:last-child) .tl-line {
+            position: absolute; left: 7px; top: 18px; bottom: -4px;
+            width: 2px; background: #E3F1F9;
+        }
+        .tl-dot {
+            width: 16px; height: 16px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+            display: flex; align-items: center; justify-content: center; position: relative; z-index: 1;
+        }
+        .tl-dot.done    { background: #1BB975; }
+        .tl-dot.current { background: #1BB975; box-shadow: 0 0 0 4px rgba(27,185,117,0.15); }
+        .tl-dot.pending { background: #E0E0E0; }
+        .tl-dot i { font-size: 7px; color: #fff; }
+
+        /* ── Btn ── */
+        .btn-export {
+            display: flex; align-items: center; justify-content: center; gap-8;
+            width: 100%; height: 40px; background: #3087CC; color: #fff;
+            font-size: 14px; font-weight: 500; border-radius: 8px; border: none;
+            cursor: pointer; text-decoration: none; transition: background 0.15s; gap: 8px;
+        }
+        .btn-export:hover { background: #006DAD; }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-btn { display: flex !important; }
+            .detail-layout { flex-direction: column; }
+            .right-col { position: static !important; width: 100% !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#FAFAFA]">
+
+<!-- ════════════════════ SIDEBAR ════════════════════ -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-[#E3F1F9] flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-heart-pulse text-[#3087CC] text-base"></i>
+            </div>
+            <div>
+                <div class="text-[13px] font-bold text-[#3C444F] leading-tight">心理中心绿色通道</div>
+                <div class="text-[11px] text-[#9096A2] mt-0.5">辅导员端</div>
+            </div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="counselor-applications.html" class="nav-item active">
+            <i class="fas fa-list-check"></i>
+            我的申请
+        </a>
+        <a href="counselor-apply-pc.html" class="nav-item">
+            <i class="fas fa-file-circle-plus"></i>
+            新建申请
+        </a>
+        <a href="counselor-notifications-pc.html" class="nav-item">
+            <i class="fas fa-bell"></i>
+            消息通知
+            <span class="nav-badge">2</span>
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="../index.html" class="flex items-center gap-2 text-xs text-[#9096A2] hover:text-[#3087CC] transition-colors mb-3 pb-3 border-b border-gray-100">
+            <i class="fas fa-home text-sm"></i>
+            <span>返回原型首页</span>
+        </a>
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-full bg-[#3087CC] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">张</div>
+            <div class="min-w-0">
+                <div class="text-sm font-semibold text-[#3C444F] truncate">张老师</div>
+                <div class="text-xs text-[#9096A2] truncate">计算机学院</div>
+            </div>
+        </div>
+        <a href="#" class="flex items-center gap-2 text-xs text-[#9096A2] hover:text-[#DF2027] transition-colors">
+            <i class="fas fa-arrow-right-from-bracket text-xs"></i>
+            退出登录
+        </a>
+    </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/40 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<!-- ════════════════════ MAIN CONTENT ════════════════════ -->
+<div class="main-content">
+
+    <!-- Top bar -->
+    <header class="bg-white border-b border-[#C8CAD1]/40 px-6 py-3 flex items-center sticky top-0 z-30">
+        <button onclick="toggleSidebar()" class="menu-btn hidden w-8 h-8 items-center justify-center rounded-lg hover:bg-gray-100 text-[#696F7D] mr-3">
+            <i class="fas fa-bars text-sm"></i>
+        </button>
+        <nav class="text-sm text-[#9096A2] flex items-center gap-1.5">
+            <span class="hover:text-[#3087CC] cursor-pointer transition-colors">首页</span>
+            <i class="fas fa-chevron-right text-[10px]"></i>
+            <a href="counselor-applications.html" class="hover:text-[#3087CC] transition-colors">我的申请</a>
+            <i class="fas fa-chevron-right text-[10px]"></i>
+            <span class="text-[#3C444F] font-medium">申请详情</span>
+        </nav>
+    </header>
+
+    <!-- Page body -->
+    <main class="px-8 py-6 max-w-[1440px] mx-auto">
+
+        <!-- Back link -->
+        <a href="../index.html" class="inline-flex items-center gap-1.5 text-sm text-[#9096A2] hover:text-[#3087CC] transition-colors mb-5">
+            <i class="fas fa-arrow-left text-xs"></i>
+            返回原型导航
+        </a>
+
+        <!-- Two-column layout -->
+        <div class="detail-layout flex gap-5 items-start">
+
+            <!-- ══════════════ LEFT COLUMN (65%) ══════════════ -->
+            <div class="flex-1 min-w-0" style="flex: 0 0 65%;">
+
+                <!-- Main info card -->
+                <div class="card mb-4">
+
+                    <!-- Card header -->
+                    <div class="px-5 py-4 border-b border-[#F1F5F9] flex items-center justify-between flex-wrap gap-3">
+                        <div class="flex items-center gap-3">
+                            <h1 class="text-base font-bold text-[#3C444F]">申请编号：第023号</h1>
+                            <span class="badge-lg approved">
+                                <i class="fas fa-circle-check text-sm"></i>
+                                已通过
+                            </span>
+                        </div>
+                        <span class="text-sm text-[#9096A2] tabular-nums">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            2026-05-08
+                        </span>
+                    </div>
+
+                    <!-- ── 学生基本信息 ── -->
+                    <div>
+                        <div class="sect-head">
+                            <div class="sect-head-bar"></div>
+                            <span class="sect-head-text">学生基本信息</span>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-item">
+                                <span class="info-label">姓名</span>
+                                <span class="info-value">王华</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">性别</span>
+                                <span class="info-value">男</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">年龄</span>
+                                <span class="info-value">20</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">学院</span>
+                                <span class="info-value">计算机学院</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">年级</span>
+                                <span class="info-value">大二</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">联系方式</span>
+                                <span class="info-value tabular-nums">188****6789</span>
+                            </div>
+                            <div class="info-item" style="grid-column: span 2;">
+                                <span class="info-label">身份证号</span>
+                                <span class="info-value tabular-nums tracking-wider">430123200508150012</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── 就诊类型 ── -->
+                    <div>
+                        <div class="sect-head">
+                            <div class="sect-head-bar"></div>
+                            <span class="sect-head-text">就诊类型</span>
+                        </div>
+                        <div class="px-5 py-3 border-b border-[#F1F5F9]">
+                            <span class="badge-sm blue">
+                                <i class="fas fa-user-plus text-[10px]"></i>
+                                首诊
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- ── 辅导员信息 ── -->
+                    <div>
+                        <div class="sect-head">
+                            <div class="sect-head-bar"></div>
+                            <span class="sect-head-text">辅导员信息</span>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-item">
+                                <span class="info-label">辅导员</span>
+                                <span class="info-value">张老师</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">联系方式</span>
+                                <span class="info-value tabular-nums">138****5678</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── 学生情况说明 ── -->
+                    <div>
+                        <div class="sect-head">
+                            <div class="sect-head-bar"></div>
+                            <span class="sect-head-text">学生情况说明</span>
+                        </div>
+                        <div class="px-5 py-4">
+                            <p class="text-sm text-[#3C444F] leading-7 bg-[#FAFAFA] rounded-lg p-4 border border-[#F1F5F9]">
+                                该生近期因学业压力过大，出现持续情绪低落、失眠、注意力难以集中等症状，自述心情压抑，严重影响学习和日常生活，建议尽快就诊。
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Bottom nav -->
+                <div class="flex items-center justify-between flex-wrap gap-3">
+                    <a href="counselor-applications.html"
+                       class="inline-flex items-center gap-2 text-sm text-[#696F7D] hover:text-[#3087CC] transition-colors">
+                        <i class="fas fa-arrow-left text-xs"></i>
+                        返回申请列表
+                    </a>
+                    <a href="../index.html"
+                       class="inline-flex items-center gap-2 text-sm text-[#9096A2] hover:text-[#3087CC] transition-colors">
+                        <i class="fas fa-house text-xs"></i>
+                        返回原型导航
+                    </a>
+                </div>
+            </div>
+
+            <!-- ══════════════ RIGHT COLUMN (35%) ══════════════ -->
+            <div class="right-col flex flex-col gap-4" style="width: 35%; position: sticky; top: 72px;">
+
+                <!-- Card 1: 审批状态 -->
+                <div class="card">
+                    <div class="sect-head">
+                        <div class="sect-head-bar"></div>
+                        <span class="sect-head-text">审批状态</span>
+                    </div>
+                    <div class="px-5 py-5 flex flex-col items-center text-center border-b border-[#F1F5F9]">
+                        <!-- Big status icon -->
+                        <div class="w-16 h-16 rounded-full bg-[#E8FCF4] flex items-center justify-center mb-3">
+                            <i class="fas fa-circle-check text-[#1BB975] text-3xl"></i>
+                        </div>
+                        <span class="badge-lg approved mb-4">已通过</span>
+                        <div class="w-full space-y-2 text-sm text-left">
+                            <div class="flex items-center justify-between py-2 border-b border-[#F1F5F9]">
+                                <span class="text-[#9096A2]">编号</span>
+                                <span class="font-medium text-[#3C444F]">第023号</span>
+                            </div>
+                            <div class="flex items-center justify-between py-2 border-b border-[#F1F5F9]">
+                                <span class="text-[#9096A2]">审批时间</span>
+                                <span class="font-medium text-[#3C444F] tabular-nums">2026-05-08 14:30</span>
+                            </div>
+                            <div class="flex items-center justify-between py-2">
+                                <span class="text-[#9096A2]">审批人</span>
+                                <span class="font-medium text-[#3C444F]">李主任</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: 审批流程 -->
+                <div class="card">
+                    <div class="sect-head">
+                        <div class="sect-head-bar"></div>
+                        <span class="sect-head-text">审批流程</span>
+                    </div>
+                    <div class="timeline">
+                        <!-- Step 1 -->
+                        <div class="tl-item">
+                            <div class="tl-line"></div>
+                            <div class="tl-dot done"><i class="fas fa-check"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-[#3C444F]">已提交</div>
+                                <div class="text-xs text-[#9096A2] mt-0.5 tabular-nums">2026-05-08 09:30</div>
+                            </div>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="tl-item">
+                            <div class="tl-line"></div>
+                            <div class="tl-dot done"><i class="fas fa-check"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-medium text-[#3C444F]">审核中</div>
+                                <div class="text-xs text-[#9096A2] mt-0.5 tabular-nums">2026-05-08 10:00</div>
+                            </div>
+                        </div>
+                        <!-- Step 3 (current) -->
+                        <div class="tl-item">
+                            <div class="tl-dot current"><i class="fas fa-check"></i></div>
+                            <div class="flex-1 min-w-0">
+                                <div class="text-sm font-bold text-[#1BB975] flex items-center gap-2">
+                                    已通过
+                                    <span class="text-[10px] bg-[#E8FCF4] text-[#1BB975] px-2 py-0.5 rounded-full font-medium">当前</span>
+                                </div>
+                                <div class="text-xs text-[#9096A2] mt-0.5 tabular-nums">2026-05-08 14:30</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: 操作 -->
+                <div class="card">
+                    <div class="sect-head">
+                        <div class="sect-head-bar"></div>
+                        <span class="sect-head-text">操作</span>
+                    </div>
+                    <div class="px-4 py-4">
+                        <a href="../04-管理员PC端/admin-export-preview.html" class="btn-export">
+                            <i class="fas fa-file-arrow-down text-sm"></i>
+                            导出申请表
+                        </a>
+                        <p class="text-xs text-[#9096A2] text-center mt-2">
+                            <i class="fas fa-circle-info text-[10px] mr-1"></i>
+                            导出为 PDF 格式
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('hidden');
+    }
+</script>
+</body>
+</html>

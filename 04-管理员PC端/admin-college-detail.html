@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学院申请明细 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3087CC',
+            'primary-light': '#E3F1F9',
+            'primary-dark': '#006DAD',
+            success: '#1BB975',
+            'success-bg': '#E8FCF4',
+            warning: '#F29100',
+            'warning-bg': '#FFF5E5',
+            error: '#DF2027',
+            'error-bg': '#FCE8EA',
+            'text-primary': '#3C444F',
+            'text-secondary': '#696F7D',
+            'text-muted': '#9096A2',
+            border: '#C8CAD1',
+            'page-bg': '#FAFAFA',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+          },
+          borderRadius: {
+            card: '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #FAFAFA; color: #3C444F; }
+
+    .sidebar { width: 240px; min-height: 100vh; background: #fff; border-right: 1px solid #C8CAD1; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; z-index: 50; }
+    .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #F0F0F0; }
+    .sidebar-logo h1 { font-size: 16px; font-weight: 700; color: #3087CC; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item { display: flex; align-items: center; padding: 12px 20px; margin: 2px 8px; border-radius: 8px; color: #696F7D; font-size: 14px; text-decoration: none; transition: all 0.15s; }
+    .nav-item i { width: 20px; text-align: center; margin-right: 12px; font-size: 15px; }
+    .nav-item:hover { background: #F5F5F5; color: #3C444F; }
+    .nav-item.active { background: #E3F1F9; color: #3087CC; font-weight: 600; }
+    .sidebar-user { padding: 16px 20px; border-top: 1px solid #F0F0F0; display: flex; align-items: center; justify-content: space-between; }
+    .sidebar-user .user-info { display: flex; align-items: center; gap: 10px; }
+    .sidebar-user .avatar { width: 36px; height: 36px; border-radius: 50%; background: #E3F1F9; color: #3087CC; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
+    .sidebar-user .name { font-size: 14px; font-weight: 500; color: #3C444F; }
+    .sidebar-user .role { font-size: 12px; color: #9096A2; }
+    .sidebar-user .logout { color: #9096A2; font-size: 16px; cursor: pointer; transition: color 0.15s; }
+    .sidebar-user .logout:hover { color: #DF2027; }
+
+    .main-content { margin-left: 240px; min-height: 100vh; }
+
+    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+    .badge-success { background: #E8FCF4; color: #1BB975; }
+    .badge-error { background: #FCE8EA; color: #DF2027; }
+    .badge-warning { background: #FFF5E5; color: #F29100; }
+
+    .filter-btn { padding: 6px 14px; font-size: 13px; border-radius: 6px; border: 1px solid #C8CAD1; background: #fff; color: #696F7D; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+    .filter-btn:hover { border-color: #3087CC; color: #3087CC; }
+    .filter-btn.active { background: #3087CC; color: #fff; border-color: #3087CC; }
+
+    .action-link { font-size: 13px; color: #3087CC; text-decoration: none; transition: color 0.15s; }
+    .action-link:hover { color: #006DAD; text-decoration: underline; }
+    .action-link.approve { color: #F29100; }
+    .action-link.approve:hover { color: #d97800; }
+
+    .export-dropdown { position: relative; display: inline-block; }
+    .export-menu { display: none; position: absolute; bottom: calc(100% + 8px); right: 0; background: #fff; border: 1px solid #C8CAD1; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,0.1); min-width: 160px; overflow: hidden; z-index: 100; }
+    .export-menu.open { display: block; }
+    .export-menu a { display: flex; align-items: center; gap: 10px; padding: 10px 16px; font-size: 13px; color: #3C444F; text-decoration: none; transition: background 0.12s; }
+    .export-menu a:hover { background: #F5F5F5; }
+    .export-menu a i { width: 16px; text-align: center; color: #3087CC; font-size: 13px; }
+
+    .page-btn { padding: 6px 14px; font-size: 13px; border-radius: 6px; border: 1px solid #C8CAD1; background: #fff; color: #696F7D; cursor: pointer; transition: all 0.15s; }
+    .page-btn:hover:not(:disabled) { border-color: #3087CC; color: #3087CC; }
+    .page-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .header-stripe { height: 4px; background: linear-gradient(90deg, #3087CC, #1BB975); border-radius: 8px 8px 0 0; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #3087CC, #006DAD);">
+          <i class="fa-solid fa-heart-pulse text-white text-sm"></i>
+        </div>
+        <h1>心理中心绿色通道</h1>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>数据概览</a>
+      <a href="admin-applications.html" class="nav-item"><i class="fa-solid fa-file-lines"></i>申请管理</a>
+      <a href="admin-statistics.html" class="nav-item active"><i class="fa-solid fa-chart-column"></i>数据统计</a>
+    </nav>
+        <a href="../index.html" class="flex items-center gap-2 px-5 py-2 mt-3 text-[#94A3B8] text-xs hover:text-white transition-colors">
+            <i class="fas fa-home"></i>
+            <span>返回原型首页</span>
+        </a>
+    <div class="sidebar-user">
+      <div class="user-info">
+        <div class="avatar">李</div>
+        <div>
+          <div class="name">李主任</div>
+          <div class="role">心理中心管理员</div>
+        </div>
+      </div>
+      <a href="#" class="logout" title="退出登录"><i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar / Breadcrumb -->
+    <div class="bg-white border-b border-border px-6 py-4 flex items-center gap-2">
+      <a href="admin-statistics.html" class="text-text-muted hover:text-primary transition text-sm flex items-center gap-1.5">
+        <i class="fa-solid fa-arrow-left text-xs"></i>
+      </a>
+      <a href="admin-dashboard.html" class="text-text-muted hover:text-primary transition text-sm">首页</a>
+      <span class="text-text-muted text-sm">&gt;</span>
+      <a href="admin-statistics.html" class="text-text-muted hover:text-primary transition text-sm">数据统计</a>
+      <span class="text-text-muted text-sm">&gt;</span>
+      <span class="text-text-primary text-sm font-medium">学院明细</span>
+    </div>
+
+    <div class="p-6">
+
+      <!-- Page Header Card -->
+      <div class="bg-white rounded-card shadow-card mb-5 overflow-hidden">
+        <div class="header-stripe"></div>
+        <div class="px-6 py-5">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="flex items-center gap-3 mb-1">
+                <h2 class="text-lg font-bold text-text-primary">信息科学与工程学院 - 申请明细</h2>
+                <span class="px-2.5 py-0.5 text-xs font-medium rounded-full" style="background: #E3F1F9; color: #3087CC;">全学年</span>
+              </div>
+              <p class="text-sm text-text-muted">2025-2026 学年度申请数据汇总</p>
+            </div>
+            <a href="admin-statistics.html" class="text-sm text-text-muted hover:text-primary transition flex items-center gap-1.5 mt-1">
+              <i class="fa-solid fa-arrow-left text-xs"></i>返回数据统计
+            </a>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="flex items-center gap-0 mt-5 flex-wrap">
+            <div class="flex flex-col items-center pr-7 mr-7 border-r border-border">
+              <span class="text-2xl font-bold text-text-primary">42</span>
+              <span class="text-xs text-text-muted mt-0.5">申请总数</span>
+            </div>
+            <div class="flex flex-col items-center pr-7 mr-7 border-r border-border">
+              <span class="text-2xl font-bold" style="color: #1BB975;">37</span>
+              <span class="text-xs text-text-muted mt-0.5">已通过</span>
+            </div>
+            <div class="flex flex-col items-center pr-7 mr-7 border-r border-border">
+              <span class="text-2xl font-bold" style="color: #DF2027;">3</span>
+              <span class="text-xs text-text-muted mt-0.5">已驳回</span>
+            </div>
+            <div class="flex flex-col items-center pr-7 mr-7 border-r border-border">
+              <span class="text-2xl font-bold" style="color: #F29100;">2</span>
+              <span class="text-xs text-text-muted mt-0.5">待审核</span>
+            </div>
+            <div class="flex flex-col items-center">
+              <span class="text-2xl font-bold" style="color: #3087CC;">88.1%</span>
+              <span class="text-xs text-text-muted mt-0.5">通过率</span>
+            </div>
+
+            <!-- Mini progress bar -->
+            <div class="ml-auto hidden lg:flex flex-col items-end gap-1.5">
+              <div class="flex items-center gap-2 text-xs text-text-muted">
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#1BB975;"></span>已通过 37</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#DF2027;"></span>已驳回 3</span>
+                <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#F29100;"></span>待审核 2</span>
+              </div>
+              <div class="w-64 h-2.5 rounded-full overflow-hidden" style="background: #F0F0F0;">
+                <div class="h-full flex">
+                  <div style="width: 88.1%; background: #1BB975;"></div>
+                  <div style="width: 7.1%; background: #DF2027;"></div>
+                  <div style="width: 4.8%; background: #F29100;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="bg-white rounded-card shadow-card px-5 py-4 mb-5">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Status Filter -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm text-text-muted mr-1">状态：</span>
+            <button class="filter-btn active" onclick="setFilter(this, 'status')">全部</button>
+            <button class="filter-btn" onclick="setFilter(this, 'status')">已通过</button>
+            <button class="filter-btn" onclick="setFilter(this, 'status')">已驳回</button>
+            <button class="filter-btn" onclick="setFilter(this, 'status')">待审核</button>
+          </div>
+
+          <div class="w-px h-6 bg-border mx-1"></div>
+
+          <!-- Visit Type Filter -->
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm text-text-muted mr-1">就诊类型：</span>
+            <button class="filter-btn active" onclick="setFilter(this, 'type')">全部</button>
+            <button class="filter-btn" onclick="setFilter(this, 'type')">首诊</button>
+            <button class="filter-btn" onclick="setFilter(this, 'type')">复诊</button>
+          </div>
+
+          <!-- Search (pushed to right) -->
+          <div class="ml-auto flex items-center gap-2">
+            <div class="relative">
+              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-xs"></i>
+              <input
+                type="text"
+                placeholder="搜索学生姓名或学号"
+                class="pl-8 pr-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:border-primary transition w-52"
+              >
+            </div>
+            <button class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-lg hover:bg-primary-dark transition flex items-center gap-1.5">
+              <i class="fa-solid fa-search text-xs"></i>搜索
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="bg-white rounded-card shadow-card overflow-hidden border border-gray-100 mb-5">
+        <div class="px-5 py-3.5 border-b border-gray-100 flex items-center justify-between">
+          <div class="text-sm text-text-secondary">
+            共 <span class="font-semibold text-text-primary">42</span> 条申请记录
+          </div>
+          <div class="flex items-center gap-2 text-xs text-text-muted">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>仅显示当前页 12 条</span>
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr style="background: #E3F1F9;">
+                <th class="px-4 py-3 text-left font-medium text-text-secondary whitespace-nowrap">编号</th>
+                <th class="px-4 py-3 text-left font-medium text-text-secondary">学生姓名</th>
+                <th class="px-4 py-3 text-center font-medium text-text-secondary">性别</th>
+                <th class="px-4 py-3 text-center font-medium text-text-secondary">年级</th>
+                <th class="px-4 py-3 text-center font-medium text-text-secondary whitespace-nowrap">就诊类型</th>
+                <th class="px-4 py-3 text-center font-medium text-text-secondary">辅导员</th>
+                <th class="px-4 py-3 text-center font-medium text-text-secondary whitespace-nowrap">
+                  就诊日期 <i class="fa-solid fa-sort text-xs text-text-muted ml-0.5 cursor-pointer"></i>
+                </th>
+                <th class="px-4 py-3 text-center font-medium text-text-secondary">状态</th>
+                <th class="px-4 py-3 text-center font-medium text-text-secondary">操作</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+
+              <!-- Row 1: 已通过 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第001号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">李明</td>
+                <td class="px-4 py-3 text-center text-text-secondary">男</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大三</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">张老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2025-09-15</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-success">已通过</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-border">|</span>
+                    <a href="#" class="action-link"><i class="fa-solid fa-download text-xs mr-0.5"></i>导出</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2: 已通过 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第002号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">王雪</td>
+                <td class="px-4 py-3 text-center text-text-secondary">女</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大二</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">张老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2025-09-22</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-success">已通过</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-border">|</span>
+                    <a href="#" class="action-link"><i class="fa-solid fa-download text-xs mr-0.5"></i>导出</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3: 已通过 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第003号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">赵强</td>
+                <td class="px-4 py-3 text-center text-text-secondary">男</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大四</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#F0EFF9; color:#6C5CE7;">复诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">李老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2025-10-05</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-success">已通过</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-border">|</span>
+                    <a href="#" class="action-link"><i class="fa-solid fa-download text-xs mr-0.5"></i>导出</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4: 已驳回 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第004号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">林晓</td>
+                <td class="px-4 py-3 text-center text-text-secondary">女</td>
+                <td class="px-4 py-3 text-center text-text-secondary">研一</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">王老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2025-10-18</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-error">已驳回</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-text-muted">—</span>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5: 已通过 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第005号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">陈磊</td>
+                <td class="px-4 py-3 text-center text-text-secondary">男</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大一</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">赵老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2025-11-02</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-success">已通过</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-border">|</span>
+                    <a href="#" class="action-link"><i class="fa-solid fa-download text-xs mr-0.5"></i>导出</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 6: 已通过 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第006号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">刘芳</td>
+                <td class="px-4 py-3 text-center text-text-secondary">女</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大三</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#F0EFF9; color:#6C5CE7;">复诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">张老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2025-11-14</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-success">已通过</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-border">|</span>
+                    <a href="#" class="action-link"><i class="fa-solid fa-download text-xs mr-0.5"></i>导出</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 7: 已通过 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第007号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">孙宇</td>
+                <td class="px-4 py-3 text-center text-text-secondary">男</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大二</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">李老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2025-12-01</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-success">已通过</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-border">|</span>
+                    <a href="#" class="action-link"><i class="fa-solid fa-download text-xs mr-0.5"></i>导出</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 8: 已驳回 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第008号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">周丽</td>
+                <td class="px-4 py-3 text-center text-text-secondary">女</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大四</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">王老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2025-12-20</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-error">已驳回</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-text-muted">—</span>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 9: 已通过 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第009号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">吴杰</td>
+                <td class="px-4 py-3 text-center text-text-secondary">男</td>
+                <td class="px-4 py-3 text-center text-text-secondary">研二</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#F0EFF9; color:#6C5CE7;">复诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">赵老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2026-01-08</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-success">已通过</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-border">|</span>
+                    <a href="#" class="action-link"><i class="fa-solid fa-download text-xs mr-0.5"></i>导出</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 10: 待审核 (no number) -->
+              <tr class="hover:bg-gray-50 transition" style="background: #FFFBF2;">
+                <td class="px-4 py-3 text-text-muted text-xs">—</td>
+                <td class="px-4 py-3 font-medium text-text-primary">钱明</td>
+                <td class="px-4 py-3 text-center text-text-secondary">男</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大三</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">张老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2026-02-15</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-warning">待审核</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link approve flex items-center gap-1">
+                      <i class="fa-solid fa-pen-to-square text-xs"></i>审批
+                    </a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 11: 已通过 -->
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 text-text-muted text-xs font-mono">第010号</td>
+                <td class="px-4 py-3 font-medium text-text-primary">何静</td>
+                <td class="px-4 py-3 text-center text-text-secondary">女</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大二</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">李老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2026-03-05</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-success">已通过</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link">查看</a>
+                    <span class="text-border">|</span>
+                    <a href="#" class="action-link"><i class="fa-solid fa-download text-xs mr-0.5"></i>导出</a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 12: 待审核 (no number) -->
+              <tr class="hover:bg-gray-50 transition" style="background: #FFFBF2;">
+                <td class="px-4 py-3 text-text-muted text-xs">—</td>
+                <td class="px-4 py-3 font-medium text-text-primary">郑伟</td>
+                <td class="px-4 py-3 text-center text-text-secondary">男</td>
+                <td class="px-4 py-3 text-center text-text-secondary">大一</td>
+                <td class="px-4 py-3 text-center">
+                  <span class="px-2 py-0.5 rounded text-xs" style="background:#E3F1F9; color:#3087CC;">首诊</span>
+                </td>
+                <td class="px-4 py-3 text-center text-text-secondary">王老师</td>
+                <td class="px-4 py-3 text-center text-text-secondary">2026-04-10</td>
+                <td class="px-4 py-3 text-center"><span class="badge badge-warning">待审核</span></td>
+                <td class="px-4 py-3 text-center">
+                  <div class="flex items-center justify-center gap-3">
+                    <a href="#" class="action-link approve flex items-center gap-1">
+                      <i class="fa-solid fa-pen-to-square text-xs"></i>审批
+                    </a>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-5 py-3.5 border-t border-gray-100 flex items-center justify-between">
+          <span class="text-sm text-text-muted">共 <span class="text-text-primary font-medium">42</span> 条 &nbsp;|&nbsp; 第 <span class="text-text-primary font-medium">1</span> / 4 页</span>
+          <div class="flex items-center gap-2">
+            <button class="page-btn" disabled>
+              <i class="fa-solid fa-chevron-left text-xs mr-0.5"></i>上一页
+            </button>
+            <div class="flex items-center gap-1">
+              <button class="w-8 h-8 rounded-md text-sm font-medium flex items-center justify-center" style="background: #3087CC; color: #fff;">1</button>
+              <button class="w-8 h-8 rounded-md text-sm text-text-secondary hover:bg-gray-100 transition flex items-center justify-center">2</button>
+              <button class="w-8 h-8 rounded-md text-sm text-text-secondary hover:bg-gray-100 transition flex items-center justify-center">3</button>
+              <button class="w-8 h-8 rounded-md text-sm text-text-secondary hover:bg-gray-100 transition flex items-center justify-center">4</button>
+            </div>
+            <button class="page-btn">
+              下一页<i class="fa-solid fa-chevron-right text-xs ml-0.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Actions & Links -->
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <a href="admin-statistics.html" class="text-sm text-text-muted hover:text-primary transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left text-xs"></i>返回数据统计
+          </a>
+          <span class="text-border">|</span>
+          <a href="../index.html" class="text-sm text-text-muted hover:text-primary transition flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-left text-xs"></i>返回原型导航
+          </a>
+        </div>
+
+        <!-- Export All Dropdown -->
+        <div class="export-dropdown" id="exportDropdown">
+          <button
+            onclick="toggleExport()"
+            class="px-5 py-2.5 text-sm font-medium rounded-card flex items-center gap-2 transition"
+            style="background: #3087CC; color: #fff; border: none; cursor: pointer;"
+            onmouseover="this.style.background='#006DAD'" onmouseout="this.style.background='#3087CC'"
+          >
+            <i class="fa-solid fa-file-export"></i>
+            导出本学院数据
+            <i class="fa-solid fa-chevron-up text-xs opacity-75"></i>
+          </button>
+          <div class="export-menu" id="exportMenu">
+            <a href="#">
+              <i class="fa-solid fa-table-list"></i>
+              导出列表（Excel）
+            </a>
+            <a href="#">
+              <i class="fa-solid fa-file-pdf"></i>
+              导出申请表（PDF）
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function setFilter(btn, group) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function toggleExport() {
+      const menu = document.getElementById('exportMenu');
+      menu.classList.toggle('open');
+    }
+
+    document.addEventListener('click', function(e) {
+      const dropdown = document.getElementById('exportDropdown');
+      if (!dropdown.contains(e.target)) {
+        document.getElementById('exportMenu').classList.remove('open');
+      }
+    });
+  </script>
+</body>
+</html>

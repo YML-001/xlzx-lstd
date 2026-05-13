@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>导出预览 - 绿色通道就诊申请表</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #3087CC;
+            --primary-light: #E3F1F9;
+            --primary-dark: #006DAD;
+            --success: #1BB975;
+            --success-bg: #E8FCF4;
+            --text-primary: #3C444F;
+            --text-secondary: #696F7D;
+            --text-muted: #9096A2;
+            --border: #C8CAD1;
+            --bg: #EAECF0;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Top Bar ── */
+        .top-bar {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 0 32px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        .breadcrumb a { color: var(--text-muted); text-decoration: none; transition: color 0.15s; }
+        .breadcrumb a:hover { color: var(--primary); }
+        .breadcrumb .sep { font-size: 11px; color: #BCC0C8; }
+        .breadcrumb .current { color: var(--text-primary); font-weight: 500; }
+
+        .top-actions { display: flex; align-items: center; gap: 10px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.18s;
+            text-decoration: none;
+        }
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: #fff; }
+        .btn-success:hover { background: #16a367; }
+        .btn-outline { background: #fff; color: var(--text-secondary); border: 1px solid var(--border); }
+        .btn-outline:hover { background: #f5f5f5; color: var(--text-primary); }
+
+        /* ── Page Body ── */
+        .page-body {
+            flex: 1;
+            padding: 36px 0 56px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ── Paper ── */
+        .paper-wrap {
+            width: 820px;
+            background: #fff;
+            border: 1px solid #d0d0d0;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+            border-radius: 2px;
+            padding: 52px 60px 48px;
+            position: relative;
+        }
+
+        /* page-edge detail lines top/bottom */
+        .paper-wrap::before,
+        .paper-wrap::after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 0; right: 0;
+            height: 4px;
+        }
+        .paper-wrap::before { top: 0; background: linear-gradient(to bottom, #e8e8e8, transparent); border-radius: 2px 2px 0 0; }
+        .paper-wrap::after { bottom: 0; background: linear-gradient(to top, #e8e8e8, transparent); border-radius: 0 0 2px 2px; }
+
+        /* ── Document Typography ── */
+        .doc-font {
+            font-family: 'SimSun', 'STSong', 'FangSong', Georgia, 'Times New Roman', serif;
+        }
+
+        /* Document header */
+        .doc-school {
+            font-size: 14px;
+            text-align: center;
+            color: #222;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .doc-title {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            color: #111;
+            letter-spacing: 4px;
+            margin-bottom: 4px;
+        }
+
+        .doc-number {
+            position: absolute;
+            top: 52px;
+            right: 60px;
+            font-size: 13px;
+            color: #444;
+            border: 1px solid #aaa;
+            padding: 3px 12px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+            background: #fff;
+        }
+
+        .doc-divider {
+            border: none;
+            border-top: 2px solid #111;
+            margin: 12px 0 20px;
+        }
+
+        /* ── Form Table ── */
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            color: #1a1a1a;
+        }
+
+        .form-table th,
+        .form-table td {
+            border: 1px solid #888;
+            padding: 9px 12px;
+            vertical-align: middle;
+        }
+
+        .form-table th {
+            background: #f5f5f5;
+            font-weight: 600;
+            white-space: nowrap;
+            text-align: center;
+            width: 1%;
+        }
+
+        .form-table .section-label {
+            background: #e8e8e8;
+            font-weight: 700;
+            font-size: 13.5px;
+            letter-spacing: 1px;
+            text-align: center;
+            padding: 10px 12px;
+        }
+
+        .form-table .field-val {
+            font-size: 14px;
+            color: #111;
+            padding-left: 14px;
+        }
+
+        .form-table .hint {
+            font-size: 12px;
+            color: #666;
+            font-weight: 400;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* checkbox style */
+        .checkbox-inline {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-right: 20px;
+            font-size: 15px;
+        }
+        .checkbox-inline .box { font-size: 16px; }
+        .checked-box { color: #111; }
+        .unchecked-box { color: #888; }
+
+        /* description area */
+        .desc-area {
+            min-height: 80px;
+            line-height: 1.8;
+            font-size: 14px;
+            color: #111;
+            padding: 2px 0;
+        }
+        .desc-hint {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* ── Date row ── */
+        .date-row {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0;
+            font-size: 14px;
+            color: #111;
+        }
+        .date-row .label { margin-right: 4px; }
+        .date-row .val { font-weight: 600; }
+
+        /* ── Notes ── */
+        .doc-notes {
+            margin-top: 22px;
+            padding: 14px 16px;
+            border: 1px solid #bbb;
+            background: #fafafa;
+            border-radius: 2px;
+        }
+        .doc-notes .note-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #222;
+            letter-spacing: 0.5px;
+        }
+        .doc-notes ol {
+            list-style: none;
+            padding: 0;
+        }
+        .doc-notes li {
+            font-size: 13px;
+            color: #444;
+            line-height: 1.8;
+        }
+
+        /* ── Doc Footer ── */
+        .doc-footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            letter-spacing: 1px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* ── Demo Banner ── */
+        .demo-banner {
+            width: 820px;
+            margin-top: 20px;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-radius: 8px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .demo-banner i { color: #3B82F6; font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+        .demo-banner p { font-size: 13.5px; color: #1E40AF; line-height: 1.6; }
+
+        /* ── Bottom Nav Links ── */
+        .bottom-links {
+            width: 820px;
+            margin-top: 24px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .bottom-links a {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 13.5px;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        .bottom-links a:hover { color: var(--primary); }
+
+        /* ── Print styles ── */
+        @media print {
+            body { background: #fff; }
+            .top-bar, .demo-banner, .bottom-links { display: none !important; }
+            .page-body { padding: 0; }
+            .paper-wrap {
+                width: 100%;
+                border: none;
+                box-shadow: none;
+                padding: 20mm 18mm;
+                border-radius: 0;
+            }
+            .paper-wrap::before, .paper-wrap::after { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <header class="top-bar">
+        <nav class="breadcrumb">
+            <a href="admin-dashboard.html">首页</a>
+            <i class="fas fa-chevron-right sep"></i>
+            <a href="admin-applications.html">申请管理</a>
+            <i class="fas fa-chevron-right sep"></i>
+            <span class="current">导出预览</span>
+        </nav>
+        <div class="top-actions">
+            <button class="btn btn-outline" onclick="window.print()">
+                <i class="fas fa-print"></i>打印
+            </button>
+            <button class="btn btn-success" onclick="handleDownload()">
+                <i class="fas fa-file-word"></i>下载 Word
+            </button>
+            <a href="admin-applications.html" class="btn btn-outline">
+                <i class="fas fa-arrow-left"></i>返回
+            </a>
+        </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="page-body">
+
+        <!-- A4 Paper -->
+        <div class="paper-wrap doc-font">
+
+            <!-- Top-right number badge -->
+            <div class="doc-number">第 <strong>023</strong> 号（心理中心填写）</div>
+
+            <!-- Document header -->
+            <div class="doc-school">中南大学大学生心理健康教育中心</div>
+            <div class="doc-title">绿色通道就诊申请表</div>
+            <hr class="doc-divider">
+
+            <!-- Form table -->
+            <table class="form-table">
+                <!-- Section 1 -->
+                <tr>
+                    <td colspan="6" class="section-label">一、学生基本信息</td>
+                </tr>
+                <tr>
+                    <th style="width:80px;">姓&ensp;名</th>
+                    <td class="field-val" style="width:100px;">王华</td>
+                    <th style="width:60px;">性&ensp;别</th>
+                    <td class="field-val" style="width:60px;">男</td>
+                    <th style="width:60px;">年&ensp;龄</th>
+                    <td class="field-val">20 岁</td>
+                </tr>
+                <tr>
+                    <th>学&ensp;院</th>
+                    <td class="field-val" colspan="3">计算机学院</td>
+                    <th>年&ensp;级</th>
+                    <td class="field-val">大二</td>
+                </tr>
+                <tr>
+                    <th>身份证号</th>
+                    <td class="field-val" colspan="3" style="letter-spacing:1.5px;">430123200508150012</td>
+                    <th>联系方式</th>
+                    <td class="field-val">188-8888-6789</td>
+                </tr>
+
+                <!-- Section 2 -->
+                <tr>
+                    <td colspan="6" class="section-label">二、学生辅导员信息</td>
+                </tr>
+                <tr>
+                    <th>就诊类型</th>
+                    <td class="field-val" colspan="5">
+                        <span class="checkbox-inline">
+                            <span class="box checked-box">☑</span>首诊
+                        </span>
+                        <span class="checkbox-inline">
+                            <span class="box unchecked-box">□</span>复诊
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>辅导员<br>姓&ensp;名</th>
+                    <td class="field-val" colspan="2">张老师</td>
+                    <th>辅导员<br>联系方式</th>
+                    <td class="field-val" colspan="2">138-5555-5678</td>
+                </tr>
+
+                <!-- Section 3 -->
+                <tr>
+                    <td colspan="6" class="section-label">三、学生情况简要说明</td>
+                </tr>
+                <tr>
+                    <td colspan="6" style="padding: 14px 16px;">
+                        <div class="desc-area">
+                            该生近期因学业压力过大，出现持续情绪低落、失眠、注意力难以集中等症状，自述心情压抑，严重影响学习和日常生活，建议尽快就诊。
+                        </div>
+                        <div class="desc-hint">（请用最精简的语言描述学生症状表现，可包括学生主诉及他人观察，不超过150字）</div>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Fill date -->
+            <div class="date-row doc-font">
+                <span class="label">填表日期：</span>
+                <span class="val">2026&nbsp;年&nbsp;5&nbsp;月&nbsp;8&nbsp;日</span>
+            </div>
+
+            <!-- Notes -->
+            <div class="doc-notes doc-font">
+                <div class="note-title">注意事项：</div>
+                <ol>
+                    <li>①&ensp;就诊务必携带就诊人身份证</li>
+                    <li>②&ensp;复诊学生务必携带之前就诊的病历资料</li>
+                    <li>③&ensp;学生就诊、送医务必遵守相关法律法规</li>
+                </ol>
+            </div>
+
+            <!-- Document footer -->
+            <div class="doc-footer doc-font">
+                中南大学大学生心理健康教育中心 制表
+            </div>
+
+        </div>
+        <!-- /paper-wrap -->
+
+        <!-- Demo info banner -->
+        <div class="demo-banner">
+            <i class="fas fa-circle-info"></i>
+            <p>此为原型演示页面，展示导出后的申请表样式。实际系统将直接生成 Word / PDF 文件下载，无需用户手动预览。</p>
+        </div>
+
+        <!-- Bottom nav links -->
+        <div class="bottom-links">
+            <a href="admin-applications.html">
+                <i class="fas fa-arrow-left"></i>返回申请管理
+            </a>
+            <a href="../index.html">
+                <i class="fas fa-arrow-left"></i>返回原型导航
+            </a>
+        </div>
+
+    </div>
+    <!-- /page-body -->
+
+    <script>
+        function handleDownload() {
+            const btn = document.querySelector('.btn-success');
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>生成中…';
+            btn.disabled = true;
+            btn.style.opacity = '0.75';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i>已生成';
+                btn.style.background = '#16a367';
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.disabled = false;
+                    btn.style.opacity = '';
+                    btn.style.background = '';
+                    // In a real system: trigger actual file download here
+                    const note = document.createElement('div');
+                    note.style.cssText = 'position:fixed;bottom:28px;right:28px;background:#1BB975;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;box-shadow:0 4px 16px rgba(0,0,0,0.12);z-index:9999;transition:opacity 0.3s;';
+                    note.innerHTML = '<i class="fas fa-check-circle" style="margin-right:8px;"></i>申请表 Word 文件已生成（原型演示）';
+                    document.body.appendChild(note);
+                    setTimeout(() => { note.style.opacity = '0'; setTimeout(() => note.remove(), 300); }, 2800);
+                }, 1200);
+            }, 1600);
+        }
+    </script>
+
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:24px;bottom:24px;z-index:9999;display:flex;align-items:center;gap:6px;padding:8px 14px;background:#3087CC;border-radius:20px;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:12px;font-weight:500;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.05)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house" style="font-size:12px;"></i> 原型首页</a>
+</body>
+</html>

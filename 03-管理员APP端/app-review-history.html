@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>历史审批记录 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary:          '#3087CC',
+            'primary-light':  '#E3F1F9',
+            'primary-dark':   '#006DAD',
+            success:          '#1BB975',
+            'success-bg':     '#E8FCF4',
+            'success-border': '#A7F3D0',
+            warning:          '#F29100',
+            'warning-bg':     '#FFF5E5',
+            'warning-border': '#FFE0B3',
+            error:            '#DF2027',
+            'error-bg':       '#FCE8EA',
+            'error-border':   '#F6BCBE',
+            'text-primary':   '#3C444F',
+            'text-secondary': '#696F7D',
+            'text-muted':     '#9096A2',
+            placeholder:      '#ABB0BA',
+            border:           '#C8CAD1',
+            'page-bg':        '#FAFAFA',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+          },
+          borderRadius: {
+            card: '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { background: #E3F1F9; }
+    body { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #FAFAFA; color: #3C444F; }
+
+    .phone-shell {
+      width: 375px; min-height: 100vh; margin: 0 auto; position: relative;
+      background: #FAFAFA; box-shadow: 0 0 40px rgba(0,0,0,0.12);
+    }
+    @media (min-width: 500px) {
+      html { display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+      .phone-shell { min-height: 812px; border-radius: 32px; overflow: hidden; margin: 20px auto; border: 8px solid #1a1a1a; }
+    }
+    @media (max-width: 499px) {
+      .phone-shell { width: 100%; }
+    }
+
+    .app-card { transition: background 150ms ease; cursor: pointer; }
+    .app-card:active { background: #F5F6F8 !important; }
+
+    .filter-pill { transition: all 150ms ease; cursor: pointer; }
+    .filter-pill:active { transform: scale(0.96); }
+
+    .month-pill { transition: all 150ms ease; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .month-pill:active { transform: scale(0.96); }
+
+    .filter-panel { overflow: hidden; transition: max-height 300ms ease, opacity 200ms ease; }
+    .filter-panel.collapsed { max-height: 0 !important; opacity: 0; pointer-events: none; }
+
+    /* Hide scrollbar on month strip */
+    .month-strip::-webkit-scrollbar { display: none; }
+    .month-strip { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .load-more-btn { transition: background 150ms ease; }
+    .load-more-btn:active { background: #eee; }
+  </style>
+</head>
+<body>
+  <div class="phone-shell flex flex-col">
+
+    <!-- 顶部导航栏 -->
+    <div class="bg-white px-4 pt-12 pb-3 flex items-center justify-between border-b" style="border-color: #E3F1F9;">
+      <a href="app-home-admin.html" class="flex items-center gap-2 no-underline text-text-primary">
+        <i class="fa-solid fa-arrow-left text-sm"></i>
+        <span class="text-base font-bold">历史审批记录</span>
+      </a>
+      <button id="filterToggle" class="w-10 h-10 flex items-center justify-center text-text-secondary rounded-full"
+              aria-label="筛选" aria-expanded="true">
+        <i class="fa-solid fa-sliders text-base"></i>
+      </button>
+    </div>
+
+    <!-- 筛选面板（可折叠，默认展开） -->
+    <div id="filterPanel" class="filter-panel bg-white" style="max-height: 140px; opacity: 1;">
+      <!-- 状态筛选 -->
+      <div class="px-4 pt-3 pb-2 flex items-center gap-2">
+        <button class="filter-pill active px-4 py-1.5 rounded-full text-xs font-medium border"
+                style="background:#3087CC; color:#fff; border-color:#3087CC;"
+                data-status="all" onclick="setStatusFilter(this)">全部</button>
+        <button class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium border border-border bg-white text-text-secondary"
+                data-status="approved" onclick="setStatusFilter(this)">已通过</button>
+        <button class="filter-pill px-4 py-1.5 rounded-full text-xs font-medium border border-border bg-white text-text-secondary"
+                data-status="rejected" onclick="setStatusFilter(this)">已驳回</button>
+      </div>
+
+      <!-- 月份选择器 -->
+      <div class="month-strip px-4 pb-3 flex items-center gap-2 overflow-x-auto">
+        <button class="month-pill px-3 py-1.5 rounded-full text-xs font-medium border border-border bg-white text-text-secondary"
+                data-month="2026-01" onclick="setMonthFilter(this)">2026-01</button>
+        <button class="month-pill px-3 py-1.5 rounded-full text-xs font-medium border border-border bg-white text-text-secondary"
+                data-month="2026-02" onclick="setMonthFilter(this)">2026-02</button>
+        <button class="month-pill px-3 py-1.5 rounded-full text-xs font-medium border border-border bg-white text-text-secondary"
+                data-month="2026-03" onclick="setMonthFilter(this)">2026-03</button>
+        <button class="month-pill px-3 py-1.5 rounded-full text-xs font-medium border border-border bg-white text-text-secondary"
+                data-month="2026-04" onclick="setMonthFilter(this)">2026-04</button>
+        <button class="month-pill active px-3 py-1.5 rounded-full text-xs font-medium border"
+                style="background:#3087CC; color:#fff; border-color:#3087CC;"
+                data-month="2026-05" onclick="setMonthFilter(this)">2026-05</button>
+      </div>
+    </div>
+
+    <!-- 汇总栏 -->
+    <div class="px-4 py-3 bg-primary-light border-b" style="border-color:#C8E8F5;">
+      <div class="bg-white rounded-card shadow-card px-4 py-3 flex items-center justify-around">
+        <div class="text-center">
+          <p class="text-[11px] text-text-muted mb-0.5">本月已审批</p>
+          <p class="text-xl font-bold text-text-primary">26</p>
+        </div>
+        <div class="w-px h-8 bg-border"></div>
+        <div class="text-center">
+          <p class="text-[11px] text-text-muted mb-0.5">通过</p>
+          <p class="text-xl font-bold text-success">24</p>
+        </div>
+        <div class="w-px h-8 bg-border"></div>
+        <div class="text-center">
+          <p class="text-[11px] text-text-muted mb-0.5">驳回</p>
+          <p class="text-xl font-bold text-error">2</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="flex-1 overflow-y-auto pb-6">
+      <div id="cardList" class="px-4 pt-3 space-y-3">
+
+        <!-- 卡片 1：已通过 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="approved" data-month="2026-05">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">王华</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#3087CC; background:#E3F1F9;">首诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">计算机学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：张老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-05-08</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#1BB975; background:#E8FCF4;">
+                <i class="fa-solid fa-circle-check text-[10px]"></i>已通过
+              </span>
+              <span class="text-[11px] text-text-muted font-medium">第023号</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 2：已通过 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="approved" data-month="2026-05">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">刘洋</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#7C3AED; background:#F3E8FF;">复诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">商学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：李老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-05-03</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#1BB975; background:#E8FCF4;">
+                <i class="fa-solid fa-circle-check text-[10px]"></i>已通过
+              </span>
+              <span class="text-[11px] text-text-muted font-medium">第022号</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 3：已驳回 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="rejected" data-month="2026-05">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">陈静</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#3087CC; background:#E3F1F9;">首诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">外国语学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：张老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-05-01</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#DF2027; background:#FCE8EA;">
+                <i class="fa-solid fa-circle-xmark text-[10px]"></i>已驳回
+              </span>
+              <span class="text-[11px] text-error font-medium max-w-[80px] text-right leading-tight">描述不详</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 4：已通过 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="approved" data-month="2026-04">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">赵敏</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#3087CC; background:#E3F1F9;">首诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">数学与统计学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：王老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-04-28</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#1BB975; background:#E8FCF4;">
+                <i class="fa-solid fa-circle-check text-[10px]"></i>已通过
+              </span>
+              <span class="text-[11px] text-text-muted font-medium">第021号</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 5：已通过 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="approved" data-month="2026-04">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">周芳</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#3087CC; background:#E3F1F9;">首诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">化学化工学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：王老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-04-25</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#1BB975; background:#E8FCF4;">
+                <i class="fa-solid fa-circle-check text-[10px]"></i>已通过
+              </span>
+              <span class="text-[11px] text-text-muted font-medium">第020号</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 6：已通过 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="approved" data-month="2026-04">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">孙磊</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#7C3AED; background:#F3E8FF;">复诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">物理与电子学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：刘老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-04-22</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#1BB975; background:#E8FCF4;">
+                <i class="fa-solid fa-circle-check text-[10px]"></i>已通过
+              </span>
+              <span class="text-[11px] text-text-muted font-medium">第019号</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 7：已驳回 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="rejected" data-month="2026-04">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">钱丽</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#3087CC; background:#E3F1F9;">首诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">文学与新闻传播学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：赵老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-04-20</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#DF2027; background:#FCE8EA;">
+                <i class="fa-solid fa-circle-xmark text-[10px]"></i>已驳回
+              </span>
+              <span class="text-[11px] text-error font-medium max-w-[80px] text-right leading-tight">信息不完整</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 8：已通过 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="approved" data-month="2026-04">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">吴迪</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#7C3AED; background:#F3E8FF;">复诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">商学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：陈老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-04-18</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#1BB975; background:#E8FCF4;">
+                <i class="fa-solid fa-circle-check text-[10px]"></i>已通过
+              </span>
+              <span class="text-[11px] text-text-muted font-medium">第018号</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 9：已通过 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="approved" data-month="2026-04">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">郑楠</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#3087CC; background:#E3F1F9;">首诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">数学与统计学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：林老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-04-15</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#1BB975; background:#E8FCF4;">
+                <i class="fa-solid fa-circle-check text-[10px]"></i>已通过
+              </span>
+              <span class="text-[11px] text-text-muted font-medium">第017号</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 卡片 10：已通过 -->
+        <a href="app-review-detail.html"
+           class="app-card block bg-white rounded-card shadow-card p-4 no-underline"
+           data-status="approved" data-month="2026-04">
+          <div class="flex items-start gap-3">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-[15px] font-semibold text-text-primary">李雯</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium"
+                      style="color:#3087CC; background:#E3F1F9;">首诊</span>
+              </div>
+              <p class="text-sm text-text-secondary mt-1 truncate">外国语学院</p>
+              <p class="text-xs text-text-muted mt-0.5">辅导员：张老师提交</p>
+              <p class="text-xs text-text-muted mt-1">2026-04-10</p>
+            </div>
+            <div class="flex flex-col items-end flex-shrink-0 gap-1 pt-0.5">
+              <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium"
+                    style="color:#1BB975; background:#E8FCF4;">
+                <i class="fa-solid fa-circle-check text-[10px]"></i>已通过
+              </span>
+              <span class="text-[11px] text-text-muted font-medium">第016号</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+
+      <!-- 空状态（筛选无结果时显示） -->
+      <div id="emptyState" class="hidden px-4 py-16 flex flex-col items-center text-center">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center mb-3"
+             style="background:#E3F1F9;">
+          <i class="fa-solid fa-inbox text-2xl" style="color:#9096A2;"></i>
+        </div>
+        <p class="text-sm font-medium text-text-secondary">暂无记录</p>
+        <p class="text-xs text-text-muted mt-1">当前筛选条件下没有审批记录</p>
+      </div>
+
+      <!-- 加载更多 -->
+      <div id="loadMoreWrap" class="px-4 mt-4">
+        <button class="load-more-btn w-full py-3 rounded-card text-sm text-text-muted font-medium bg-white border border-border"
+                onclick="handleLoadMore(this)">
+          加载更多
+        </button>
+      </div>
+
+      <!-- 返回原型导航 -->
+      <div class="px-4 mt-5 mb-4">
+        <a href="../index.html" class="inline-flex items-center gap-1.5 text-sm text-text-muted no-underline hover:text-primary transition-colors">
+          <i class="fa-solid fa-arrow-left text-xs"></i>
+          <span>返回原型导航</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    /* ────────────── Filter panel toggle ────────────── */
+    var filterOpen = true;
+    document.getElementById('filterToggle').addEventListener('click', function () {
+      filterOpen = !filterOpen;
+      var panel = document.getElementById('filterPanel');
+      if (filterOpen) {
+        panel.style.maxHeight = '140px';
+        panel.style.opacity = '1';
+        panel.classList.remove('collapsed');
+        this.setAttribute('aria-expanded', 'true');
+      } else {
+        panel.style.maxHeight = '0';
+        panel.style.opacity = '0';
+        panel.classList.add('collapsed');
+        this.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    /* ────────────── Active state helpers ────────────── */
+    var activeStatus = 'all';
+    var activeMonth  = '2026-05';
+
+    function setStatusFilter(el) {
+      document.querySelectorAll('.filter-pill').forEach(function (p) {
+        p.style.background   = '#fff';
+        p.style.color        = '#696F7D';
+        p.style.borderColor  = '#C8CAD1';
+      });
+      el.style.background  = '#3087CC';
+      el.style.color       = '#fff';
+      el.style.borderColor = '#3087CC';
+      activeStatus = el.dataset.status;
+      applyFilters();
+    }
+
+    function setMonthFilter(el) {
+      document.querySelectorAll('.month-pill').forEach(function (p) {
+        p.style.background   = '#fff';
+        p.style.color        = '#696F7D';
+        p.style.borderColor  = '#C8CAD1';
+      });
+      el.style.background  = '#3087CC';
+      el.style.color       = '#fff';
+      el.style.borderColor = '#3087CC';
+      activeMonth = el.dataset.month;
+      applyFilters();
+    }
+
+    function applyFilters() {
+      var cards   = document.querySelectorAll('#cardList [data-status]');
+      var visible = 0;
+
+      cards.forEach(function (card) {
+        var matchStatus = activeStatus === 'all' || card.dataset.status === activeStatus;
+        var matchMonth  = card.dataset.month === activeMonth;
+
+        if (matchStatus && matchMonth) {
+          card.style.display = '';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      var empty    = document.getElementById('emptyState');
+      var loadMore = document.getElementById('loadMoreWrap');
+      if (visible === 0) {
+        empty.classList.remove('hidden');
+        empty.classList.add('flex');
+        loadMore.style.display = 'none';
+      } else {
+        empty.classList.add('hidden');
+        empty.classList.remove('flex');
+        loadMore.style.display = '';
+      }
+    }
+
+    /* ────────────── Load more (mock) ────────────── */
+    function handleLoadMore(btn) {
+      btn.textContent = '加载中…';
+      btn.disabled    = true;
+      setTimeout(function () {
+        btn.textContent = '已加载全部';
+        btn.style.color = '#9096A2';
+        btn.disabled    = true;
+      }, 800);
+    }
+  </script>
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:16px;bottom:16px;z-index:9999;width:36px;height:36px;background:#3087CC;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:14px;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house"></i></a>
+</body>
+</html>

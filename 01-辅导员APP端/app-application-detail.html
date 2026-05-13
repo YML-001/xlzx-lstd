@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>申请详情 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#3087CC', light: '#E3F1F9', dark: '#006DAD' },
+            success: { DEFAULT: '#1BB975', light: '#E8FCF4' },
+            warning: { DEFAULT: '#F29100', light: '#FFF5E5' },
+            error: { DEFAULT: '#DF2027', light: '#FCE8EA' },
+            txt: { primary: '#3C444F', secondary: '#696F7D', muted: '#9096A2' },
+            placeholder: '#ABB0BA',
+            border: '#C8CAD1',
+            bg: '#FAFAFA',
+            card: '#FFFFFF',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .mobile-frame {
+      width: 375px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #FAFAFA;
+      position: relative;
+      overflow-x: hidden;
+    }
+    @media (min-width: 376px) {
+      body { background: #E8ECF0; }
+      .mobile-frame {
+        margin-top: 24px;
+        margin-bottom: 24px;
+        min-height: calc(100vh - 48px);
+        border-radius: 24px;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.08);
+        overflow: hidden;
+      }
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    .info-grid .info-cell {
+      padding: 10px 0;
+      border-bottom: 1px solid #F1F2F3;
+    }
+    .info-grid .info-cell:nth-last-child(-n+2) {
+      border-bottom: none;
+    }
+    .info-grid .info-cell:nth-child(odd) {
+      padding-right: 8px;
+    }
+    .info-grid .info-cell:nth-child(even) {
+      padding-left: 8px;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 22px;
+      bottom: -10px;
+      width: 2px;
+      background: #E5E7EB;
+    }
+    .timeline-item:last-child::before {
+      display: none;
+    }
+  </style>
+</head>
+<body class="font-sans text-txt-primary">
+
+<div class="mobile-frame flex flex-col">
+
+  <!-- Header -->
+  <header class="flex items-center h-11 px-4 bg-white border-b border-border flex-shrink-0 sticky top-0 z-20">
+    <a href="app-my-applications.html" class="flex items-center justify-center w-8 h-8 -ml-1 text-txt-primary">
+      <i class="fa-solid fa-chevron-left text-sm"></i>
+    </a>
+    <h1 class="flex-1 text-center text-base font-semibold pr-8">申请详情</h1>
+  </header>
+
+  <!-- Scrollable content -->
+  <div class="flex-1 overflow-y-auto pb-24">
+
+    <!-- Status banner - Rejected -->
+    <div class="mx-4 mt-4 rounded-lg overflow-hidden" style="background:#FCE8EA;">
+      <div class="px-4 py-3">
+        <div class="flex items-center gap-2 mb-2">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center" style="background:#DF2027;">
+            <i class="fa-solid fa-xmark text-white text-xs"></i>
+          </div>
+          <span class="text-[15px] font-semibold" style="color:#DF2027;">已驳回</span>
+        </div>
+        <div class="text-[13px] leading-relaxed" style="color:#DF2027;opacity:0.85;">
+          学生情况描述不够详细，请补充具体症状表现和持续时间
+        </div>
+        <a href="app-application-edit.html"
+          class="inline-flex items-center gap-1 mt-3 px-4 h-8 rounded-md text-sm font-medium text-white transition-opacity hover:opacity-90"
+          style="background:#DF2027;">
+          <i class="fa-solid fa-pen-to-square text-xs"></i>
+          修改申请
+        </a>
+      </div>
+    </div>
+
+    <!-- Student info card -->
+    <div class="mx-4 mt-4 bg-card rounded-lg shadow-card overflow-hidden">
+      <div class="px-4 py-3 border-b border-[#F1F2F3]">
+        <h2 class="text-[15px] font-semibold text-txt-primary flex items-center gap-2">
+          <i class="fa-solid fa-user-graduate text-primary text-sm"></i>
+          学生基本信息
+        </h2>
+      </div>
+      <div class="px-4">
+        <div class="info-grid">
+          <div class="info-cell">
+            <div class="text-xs text-txt-muted mb-0.5">姓名</div>
+            <div class="text-sm text-txt-primary font-medium">陈静</div>
+          </div>
+          <div class="info-cell">
+            <div class="text-xs text-txt-muted mb-0.5">性别</div>
+            <div class="text-sm text-txt-primary font-medium">女</div>
+          </div>
+          <div class="info-cell">
+            <div class="text-xs text-txt-muted mb-0.5">年龄</div>
+            <div class="text-sm text-txt-primary font-medium">20</div>
+          </div>
+          <div class="info-cell">
+            <div class="text-xs text-txt-muted mb-0.5">学院</div>
+            <div class="text-sm text-txt-primary font-medium">外国语学院</div>
+          </div>
+          <div class="info-cell">
+            <div class="text-xs text-txt-muted mb-0.5">年级</div>
+            <div class="text-sm text-txt-primary font-medium">大二</div>
+          </div>
+          <div class="info-cell">
+            <div class="text-xs text-txt-muted mb-0.5">联系方式</div>
+            <div class="text-sm text-txt-primary font-medium">177****3456</div>
+          </div>
+          <div class="info-cell" style="grid-column: 1 / -1; border-bottom: none;">
+            <div class="text-xs text-txt-muted mb-0.5">身份证号</div>
+            <div class="text-sm text-txt-primary font-medium">430****1234****5678</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Counselor info card -->
+    <div class="mx-4 mt-3 bg-card rounded-lg shadow-card overflow-hidden">
+      <div class="px-4 py-3 border-b border-[#F1F2F3]">
+        <h2 class="text-[15px] font-semibold text-txt-primary flex items-center gap-2">
+          <i class="fa-solid fa-stethoscope text-primary text-sm"></i>
+          就诊信息
+        </h2>
+      </div>
+      <div class="px-4 py-3 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-txt-secondary">就诊类型</span>
+          <span class="inline-flex items-center px-2.5 h-6 rounded text-xs font-medium"
+            style="background:#E3F1F9;color:#3087CC;">首诊</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-txt-secondary">辅导员</span>
+          <span class="text-sm text-txt-primary font-medium">张老师</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-txt-secondary">联系方式</span>
+          <span class="text-sm text-txt-primary font-medium">138****5678</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Situation description card -->
+    <div class="mx-4 mt-3 bg-card rounded-lg shadow-card overflow-hidden">
+      <div class="px-4 py-3 border-b border-[#F1F2F3]">
+        <h2 class="text-[15px] font-semibold text-txt-primary flex items-center gap-2">
+          <i class="fa-solid fa-file-medical text-primary text-sm"></i>
+          学生情况说明
+        </h2>
+      </div>
+      <div class="px-4 py-3">
+        <p class="text-sm text-txt-secondary leading-relaxed">
+          该生近期情绪低落，食欲下降，睡眠质量差
+        </p>
+      </div>
+    </div>
+
+    <!-- Timeline section -->
+    <div class="mx-4 mt-3 mb-4 bg-card rounded-lg shadow-card overflow-hidden">
+      <div class="px-4 py-3 border-b border-[#F1F2F3]">
+        <h2 class="text-[15px] font-semibold text-txt-primary flex items-center gap-2">
+          <i class="fa-solid fa-timeline text-primary text-sm"></i>
+          审批流程
+        </h2>
+      </div>
+      <div class="px-4 py-4">
+        <div class="space-y-0">
+
+          <!-- Step 1: 已提交 -->
+          <div class="timeline-item relative pl-8 pb-6">
+            <div class="absolute left-0 top-1 w-3 h-3 rounded-full border-2" style="background:#1BB975;border-color:#1BB975;"></div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-txt-primary">已提交</span>
+                <span class="text-xs text-txt-muted">2025-05-06 09:30</span>
+              </div>
+              <p class="text-[13px] text-txt-secondary mt-1">张老师提交申请</p>
+            </div>
+          </div>
+
+          <!-- Step 2: 审核中 -->
+          <div class="timeline-item relative pl-8 pb-6">
+            <div class="absolute left-0 top-1 w-3 h-3 rounded-full border-2" style="background:#1BB975;border-color:#1BB975;"></div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium text-txt-primary">审核中</span>
+                <span class="text-xs text-txt-muted">2025-05-06 10:00</span>
+              </div>
+              <p class="text-[13px] text-txt-secondary mt-1">心理中心受理</p>
+            </div>
+          </div>
+
+          <!-- Step 3: 已驳回 -->
+          <div class="timeline-item relative pl-8 pb-0">
+            <div class="absolute left-0 top-1 w-3 h-3 rounded-full border-2" style="background:#DF2027;border-color:#DF2027;"></div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium" style="color:#DF2027;">已驳回</span>
+                <span class="text-xs text-txt-muted">2025-05-06 14:30</span>
+              </div>
+              <p class="text-[13px] text-txt-secondary mt-1">审核未通过</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom fixed bar -->
+  <div class="flex-shrink-0 bg-white border-t border-border px-4 py-3 sticky bottom-0 z-20">
+    <a href="app-application-edit.html"
+      class="flex items-center justify-center w-full h-11 rounded-lg text-white font-medium text-sm transition-opacity hover:opacity-90 active:opacity-80"
+      style="background:#3087CC;">
+      <i class="fa-solid fa-pen-to-square text-xs mr-2"></i>
+      修改申请
+    </a>
+    <div class="flex justify-center mt-2">
+      <a href="../index.html" class="text-xs text-primary hover:underline inline-flex items-center gap-1">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        返回原型导航
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:16px;bottom:16px;z-index:9999;width:36px;height:36px;background:#3087CC;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:14px;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house"></i></a>
+</body>
+</html>

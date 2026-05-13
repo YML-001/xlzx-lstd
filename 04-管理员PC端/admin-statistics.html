@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据统计 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3087CC',
+            'primary-light': '#E3F1F9',
+            'primary-dark': '#006DAD',
+            success: '#1BB975',
+            'success-bg': '#E8FCF4',
+            warning: '#F29100',
+            'warning-bg': '#FFF5E5',
+            error: '#DF2027',
+            'error-bg': '#FCE8EA',
+            'text-primary': '#3C444F',
+            'text-secondary': '#696F7D',
+            'text-muted': '#9096A2',
+            border: '#C8CAD1',
+            'page-bg': '#FAFAFA',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+          },
+          borderRadius: {
+            card: '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #FAFAFA; color: #3C444F; }
+
+    .sidebar { width: 240px; min-height: 100vh; background: #fff; border-right: 1px solid #C8CAD1; position: fixed; left: 0; top: 0; display: flex; flex-direction: column; z-index: 50; }
+    .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid #F0F0F0; }
+    .sidebar-logo h1 { font-size: 16px; font-weight: 700; color: #3087CC; }
+    .sidebar-nav { flex: 1; padding: 12px 0; }
+    .nav-item { display: flex; align-items: center; padding: 12px 20px; margin: 2px 8px; border-radius: 8px; color: #696F7D; font-size: 14px; text-decoration: none; transition: all 0.15s; }
+    .nav-item i { width: 20px; text-align: center; margin-right: 12px; font-size: 15px; }
+    .nav-item:hover { background: #F5F5F5; color: #3C444F; }
+    .nav-item.active { background: #E3F1F9; color: #3087CC; font-weight: 600; }
+    .sidebar-user { padding: 16px 20px; border-top: 1px solid #F0F0F0; display: flex; align-items: center; justify-content: space-between; }
+    .sidebar-user .user-info { display: flex; align-items: center; gap: 10px; }
+    .sidebar-user .avatar { width: 36px; height: 36px; border-radius: 50%; background: #E3F1F9; color: #3087CC; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
+    .sidebar-user .name { font-size: 14px; font-weight: 500; color: #3C444F; }
+    .sidebar-user .role { font-size: 12px; color: #9096A2; }
+    .sidebar-user .logout { color: #9096A2; font-size: 16px; cursor: pointer; transition: color 0.15s; }
+    .sidebar-user .logout:hover { color: #DF2027; }
+
+    .main-content { margin-left: 240px; min-height: 100vh; }
+
+    .period-btn { padding: 6px 16px; font-size: 13px; border-radius: 6px; border: 1px solid #C8CAD1; background: #fff; color: #696F7D; cursor: pointer; transition: all 0.15s; }
+    .period-btn:hover { border-color: #3087CC; color: #3087CC; }
+    .period-btn.active { background: #3087CC; color: #fff; border-color: #3087CC; }
+
+    .stat-card { background: #fff; border-radius: 8px; padding: 20px 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 16px; }
+    .stat-card .icon-box { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+    .bar-chart-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .bar-chart-row .label { width: 160px; text-align: right; font-size: 13px; color: #696F7D; flex-shrink: 0; }
+    .bar-chart-row .bar-bg { flex: 1; height: 28px; background: #F0F0F0; border-radius: 4px; overflow: hidden; position: relative; }
+    .bar-chart-row .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+    .bar-chart-row .bar-fill span { font-size: 12px; color: #fff; font-weight: 600; }
+    .bar-chart-row .bar-value { width: 36px; font-size: 13px; font-weight: 600; color: #3C444F; text-align: right; flex-shrink: 0; }
+
+    .donut-chart { width: 200px; height: 200px; border-radius: 50%; position: relative; }
+    .donut-hole { width: 120px; height: 120px; border-radius: 50%; background: #fff; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+
+    .month-bar-group { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .month-bars { display: flex; align-items: flex-end; gap: 3px; height: 160px; }
+    .month-bars .bar { width: 16px; border-radius: 3px 3px 0 0; transition: height 0.6s ease; }
+
+    .sort-icon { color: #9096A2; margin-left: 4px; font-size: 10px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: linear-gradient(135deg, #3087CC, #006DAD);">
+          <i class="fa-solid fa-heart-pulse text-white text-sm"></i>
+        </div>
+        <h1>心理中心绿色通道</h1>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="admin-dashboard.html" class="nav-item"><i class="fa-solid fa-chart-pie"></i>数据概览</a>
+      <a href="admin-applications.html" class="nav-item"><i class="fa-solid fa-file-lines"></i>申请管理</a>
+      <a href="admin-statistics.html" class="nav-item active"><i class="fa-solid fa-chart-column"></i>数据统计</a>
+    </nav>
+        <a href="../index.html" class="flex items-center gap-2 px-5 py-2 mt-3 text-[#94A3B8] text-xs hover:text-white transition-colors">
+            <i class="fas fa-home"></i>
+            <span>返回原型首页</span>
+        </a>
+    <div class="sidebar-user">
+      <div class="user-info">
+        <div class="avatar">李</div>
+        <div>
+          <div class="name">李主任</div>
+          <div class="role">心理中心管理员</div>
+        </div>
+      </div>
+      <a href="#" class="logout" title="退出登录"><i class="fa-solid fa-right-from-bracket"></i></a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <div class="bg-white border-b border-border px-6 py-4 flex items-center justify-between">
+      <div class="text-sm text-text-secondary">
+        <a href="admin-dashboard.html" class="text-text-muted hover:text-primary transition">首页</a>
+        <span class="mx-2 text-text-muted">&gt;</span>
+        <span class="text-text-primary font-medium">数据统计</span>
+      </div>
+    </div>
+
+    <div class="p-6">
+      <!-- Period Selector -->
+      <div class="flex items-center gap-3 mb-6">
+        <span class="text-sm text-text-secondary mr-1">统计周期：</span>
+        <button class="period-btn" onclick="setPeriod(this)">本月</button>
+        <button class="period-btn" onclick="setPeriod(this)">本学期</button>
+        <button class="period-btn active" onclick="setPeriod(this)">本学年</button>
+        <button class="period-btn" onclick="setPeriod(this)" id="customPeriodBtn">自定义</button>
+        <div id="customDates" class="hidden flex items-center gap-2 ml-2">
+          <input type="date" value="2025-09-01" class="px-3 py-1.5 border border-border rounded-md text-sm focus:outline-none focus:border-primary">
+          <span class="text-text-muted">至</span>
+          <input type="date" value="2026-05-13" class="px-3 py-1.5 border border-border rounded-md text-sm focus:outline-none focus:border-primary">
+          <button class="px-4 py-1.5 bg-primary text-white text-sm rounded-md hover:bg-primary-dark transition">确定</button>
+        </div>
+      </div>
+
+      <!-- Overview Stats -->
+      <div class="grid grid-cols-4 gap-5 mb-6">
+        <div class="stat-card">
+          <div class="icon-box" style="background: #E3F1F9; color: #3087CC;">
+            <i class="fa-solid fa-file-alt"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-text-primary">286</div>
+            <div class="text-sm text-text-secondary mt-0.5">总申请数</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="icon-box" style="background: #E8FCF4; color: #1BB975;">
+            <i class="fa-solid fa-check-circle"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-text-primary">87.4%</div>
+            <div class="text-sm text-text-secondary mt-0.5">通过率</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="icon-box" style="background: #FFF5E5; color: #F29100;">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-text-primary">3.8<span class="text-base font-normal text-text-secondary">小时</span></div>
+            <div class="text-sm text-text-secondary mt-0.5">平均处理时长</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="icon-box" style="background: #EDE9FE; color: #7C3AED;">
+            <i class="fa-solid fa-users"></i>
+          </div>
+          <div>
+            <div class="text-2xl font-bold text-text-primary">24<span class="text-base font-normal text-text-secondary">人</span></div>
+            <div class="text-sm text-text-secondary mt-0.5">活跃辅导员</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row 1 -->
+      <div class="grid grid-cols-2 gap-5 mb-5">
+        <!-- Bar Chart: 各学院申请数量 -->
+        <div class="bg-white rounded-card shadow-card p-5">
+          <h3 class="text-sm font-semibold text-text-primary mb-5">各学院申请数量</h3>
+          <div>
+            <div class="bar-chart-row">
+              <div class="label">信息科学与工程学院</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 100%; background: #3087CC;"><span>42</span></div></div>
+            </div>
+            <div class="bar-chart-row">
+              <div class="label">计算机学院</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 90.5%; background: #3087CC;"><span>38</span></div></div>
+            </div>
+            <div class="bar-chart-row">
+              <div class="label">外国语学院</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 83.3%; background: #3087CC;"><span>35</span></div></div>
+            </div>
+            <div class="bar-chart-row">
+              <div class="label">商学院</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 76.2%; background: #9CBFDA;"><span>32</span></div></div>
+            </div>
+            <div class="bar-chart-row">
+              <div class="label">数学与统计学院</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 66.7%; background: #9CBFDA;"><span>28</span></div></div>
+            </div>
+            <div class="bar-chart-row">
+              <div class="label">物理与电子学院</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 59.5%; background: #9CBFDA;"><span>25</span></div></div>
+            </div>
+            <div class="bar-chart-row">
+              <div class="label">化学化工学院</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 52.4%; background: #D6EAF9;"><span>22</span></div></div>
+            </div>
+            <div class="bar-chart-row">
+              <div class="label">文学与新闻传播学院</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 42.9%; background: #D6EAF9;"><span>18</span></div></div>
+            </div>
+            <div class="bar-chart-row">
+              <div class="label">其他</div>
+              <div class="bar-bg"><div class="bar-fill" style="width: 100%; background: #E3F1F9; color: #3087CC;"><span style="color:#3087CC;">46</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donut Chart: 申请状态分布 -->
+        <div class="bg-white rounded-card shadow-card p-5">
+          <h3 class="text-sm font-semibold text-text-primary mb-5">申请状态分布</h3>
+          <div class="flex items-center justify-center gap-10 pt-4">
+            <div class="donut-chart" style="background: conic-gradient(#1BB975 0deg 314.6deg, #DF2027 314.6deg 342.4deg, #F29100 342.4deg 360deg);">
+              <div class="donut-hole">
+                <div class="text-2xl font-bold text-text-primary">286</div>
+                <div class="text-xs text-text-muted">总申请</div>
+              </div>
+            </div>
+            <div class="space-y-4">
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full" style="background: #1BB975;"></div>
+                <div>
+                  <div class="text-sm font-medium text-text-primary">已通过</div>
+                  <div class="text-xs text-text-muted">250 (87.4%)</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full" style="background: #DF2027;"></div>
+                <div>
+                  <div class="text-sm font-medium text-text-primary">已驳回</div>
+                  <div class="text-xs text-text-muted">22 (7.7%)</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-3 h-3 rounded-full" style="background: #F29100;"></div>
+                <div>
+                  <div class="text-sm font-medium text-text-primary">待审核</div>
+                  <div class="text-xs text-text-muted">14 (4.9%)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row 2: Monthly Trend -->
+      <div class="bg-white rounded-card shadow-card p-5 mb-5">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="text-sm font-semibold text-text-primary">月度申请趋势</h3>
+          <div class="flex items-center gap-5 text-xs">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:#3087CC;"></span>申请数</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:#1BB975;"></span>通过数</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm inline-block" style="background:#DF2027;"></span>驳回数</span>
+          </div>
+        </div>
+
+        <!-- Y-axis labels + chart area -->
+        <div class="flex">
+          <div class="flex flex-col justify-between text-xs text-text-muted pr-3 py-0" style="height:160px;">
+            <span>50</span><span>40</span><span>30</span><span>20</span><span>10</span><span>0</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex items-end justify-between border-b border-l border-gray-200 px-2" style="height:160px;">
+              <!-- Jun -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:48px; background:#3087CC;" title="申请数: 15"></div>
+                  <div class="bar" style="height:42px; background:#1BB975;" title="通过数: 13"></div>
+                  <div class="bar" style="height:6px; background:#DF2027;" title="驳回数: 2"></div>
+                </div>
+              </div>
+              <!-- Jul -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:26px; background:#3087CC;" title="申请数: 8"></div>
+                  <div class="bar" style="height:22px; background:#1BB975;" title="通过数: 7"></div>
+                  <div class="bar" style="height:3px; background:#DF2027;" title="驳回数: 1"></div>
+                </div>
+              </div>
+              <!-- Aug -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:16px; background:#3087CC;" title="申请数: 5"></div>
+                  <div class="bar" style="height:13px; background:#1BB975;" title="通过数: 4"></div>
+                  <div class="bar" style="height:3px; background:#DF2027;" title="驳回数: 1"></div>
+                </div>
+              </div>
+              <!-- Sep -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:80px; background:#3087CC;" title="申请数: 25"></div>
+                  <div class="bar" style="height:70px; background:#1BB975;" title="通过数: 22"></div>
+                  <div class="bar" style="height:10px; background:#DF2027;" title="驳回数: 3"></div>
+                </div>
+              </div>
+              <!-- Oct -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:93px; background:#3087CC;" title="申请数: 29"></div>
+                  <div class="bar" style="height:80px; background:#1BB975;" title="通过数: 25"></div>
+                  <div class="bar" style="height:10px; background:#DF2027;" title="驳回数: 3"></div>
+                </div>
+              </div>
+              <!-- Nov -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:106px; background:#3087CC;" title="申请数: 33"></div>
+                  <div class="bar" style="height:90px; background:#1BB975;" title="通过数: 28"></div>
+                  <div class="bar" style="height:13px; background:#DF2027;" title="驳回数: 4"></div>
+                </div>
+              </div>
+              <!-- Dec -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:112px; background:#3087CC;" title="申请数: 35"></div>
+                  <div class="bar" style="height:96px; background:#1BB975;" title="通过数: 30"></div>
+                  <div class="bar" style="height:10px; background:#DF2027;" title="驳回数: 3"></div>
+                </div>
+              </div>
+              <!-- Jan -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:64px; background:#3087CC;" title="申请数: 20"></div>
+                  <div class="bar" style="height:54px; background:#1BB975;" title="通过数: 17"></div>
+                  <div class="bar" style="height:6px; background:#DF2027;" title="驳回数: 2"></div>
+                </div>
+              </div>
+              <!-- Feb -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:35px; background:#3087CC;" title="申请数: 11"></div>
+                  <div class="bar" style="height:29px; background:#1BB975;" title="通过数: 9"></div>
+                  <div class="bar" style="height:3px; background:#DF2027;" title="驳回数: 1"></div>
+                </div>
+              </div>
+              <!-- Mar -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:96px; background:#3087CC;" title="申请数: 30"></div>
+                  <div class="bar" style="height:83px; background:#1BB975;" title="通过数: 26"></div>
+                  <div class="bar" style="height:10px; background:#DF2027;" title="驳回数: 3"></div>
+                </div>
+              </div>
+              <!-- Apr -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:122px; background:#3087CC;" title="申请数: 38"></div>
+                  <div class="bar" style="height:109px; background:#1BB975;" title="通过数: 34"></div>
+                  <div class="bar" style="height:10px; background:#DF2027;" title="驳回数: 3"></div>
+                </div>
+              </div>
+              <!-- May -->
+              <div class="month-bar-group">
+                <div class="month-bars">
+                  <div class="bar" style="height:118px; background:#3087CC;" title="申请数: 37"></div>
+                  <div class="bar" style="height:106px; background:#1BB975;" title="通过数: 33"></div>
+                  <div class="bar" style="height:6px; background:#DF2027;" title="驳回数: 2"></div>
+                </div>
+              </div>
+            </div>
+            <!-- X-axis Labels -->
+            <div class="flex justify-between px-2 mt-2">
+              <span class="text-xs text-text-muted flex-1 text-center">6月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">7月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">8月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">9月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">10月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">11月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">12月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">1月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">2月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">3月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">4月</span>
+              <span class="text-xs text-text-muted flex-1 text-center">5月</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Table -->
+      <div class="bg-white rounded-card shadow-card overflow-hidden border border-gray-100 mb-6">
+        <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-text-primary">学院详细统计</h3>
+          <button class="px-5 py-2 bg-primary text-white text-sm font-medium rounded-card hover:bg-primary-dark transition flex items-center gap-2">
+            <i class="fa-solid fa-download"></i>导出
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left" style="background: #E3F1F9;">
+                <th class="px-4 py-3 font-medium text-text-secondary">学院</th>
+                <th class="px-4 py-3 font-medium text-text-secondary text-center">申请总数 <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th class="px-4 py-3 font-medium text-text-secondary text-center">已通过 <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th class="px-4 py-3 font-medium text-text-secondary text-center">已驳回 <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th class="px-4 py-3 font-medium text-text-secondary text-center">待审核 <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th class="px-4 py-3 font-medium text-text-secondary text-center">通过率 <i class="fa-solid fa-sort sort-icon"></i></th>
+                <th class="px-4 py-3 font-medium text-text-secondary text-center">首诊</th>
+                <th class="px-4 py-3 font-medium text-text-secondary text-center">复诊</th>
+                <th class="px-4 py-3 font-medium text-text-secondary text-center">明细</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium">信息科学与工程学院</td>
+                <td class="px-4 py-3 text-center">42</td>
+                <td class="px-4 py-3 text-center text-success font-medium">37</td>
+                <td class="px-4 py-3 text-center text-error">3</td>
+                <td class="px-4 py-3 text-center text-warning">2</td>
+                <td class="px-4 py-3 text-center"><span class="text-success font-medium">88.1%</span></td>
+                <td class="px-4 py-3 text-center">28</td>
+                <td class="px-4 py-3 text-center">14</td>
+                <td class="px-4 py-3 text-center"><a href="admin-college-detail.html?college=信息科学与工程学院" style="color:#3087CC;font-size:13px;font-weight:500;">查看明细</a></td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium">计算机学院</td>
+                <td class="px-4 py-3 text-center">38</td>
+                <td class="px-4 py-3 text-center text-success font-medium">34</td>
+                <td class="px-4 py-3 text-center text-error">2</td>
+                <td class="px-4 py-3 text-center text-warning">2</td>
+                <td class="px-4 py-3 text-center"><span class="text-success font-medium">89.5%</span></td>
+                <td class="px-4 py-3 text-center">25</td>
+                <td class="px-4 py-3 text-center">13</td>
+                <td class="px-4 py-3 text-center"><a href="admin-college-detail.html?college=计算机学院" style="color:#3087CC;font-size:13px;font-weight:500;">查看明细</a></td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium">外国语学院</td>
+                <td class="px-4 py-3 text-center">35</td>
+                <td class="px-4 py-3 text-center text-success font-medium">30</td>
+                <td class="px-4 py-3 text-center text-error">3</td>
+                <td class="px-4 py-3 text-center text-warning">2</td>
+                <td class="px-4 py-3 text-center"><span class="text-success font-medium">85.7%</span></td>
+                <td class="px-4 py-3 text-center">22</td>
+                <td class="px-4 py-3 text-center">13</td>
+                <td class="px-4 py-3 text-center"><a href="admin-college-detail.html?college=外国语学院" style="color:#3087CC;font-size:13px;font-weight:500;">查看明细</a></td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium">商学院</td>
+                <td class="px-4 py-3 text-center">32</td>
+                <td class="px-4 py-3 text-center text-success font-medium">28</td>
+                <td class="px-4 py-3 text-center text-error">3</td>
+                <td class="px-4 py-3 text-center text-warning">1</td>
+                <td class="px-4 py-3 text-center"><span class="text-success font-medium">87.5%</span></td>
+                <td class="px-4 py-3 text-center">20</td>
+                <td class="px-4 py-3 text-center">12</td>
+                <td class="px-4 py-3 text-center"><a href="admin-college-detail.html?college=商学院" style="color:#3087CC;font-size:13px;font-weight:500;">查看明细</a></td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium">数学与统计学院</td>
+                <td class="px-4 py-3 text-center">28</td>
+                <td class="px-4 py-3 text-center text-success font-medium">24</td>
+                <td class="px-4 py-3 text-center text-error">2</td>
+                <td class="px-4 py-3 text-center text-warning">2</td>
+                <td class="px-4 py-3 text-center"><span class="text-success font-medium">85.7%</span></td>
+                <td class="px-4 py-3 text-center">18</td>
+                <td class="px-4 py-3 text-center">10</td>
+                <td class="px-4 py-3 text-center"><a href="admin-college-detail.html?college=数学与统计学院" style="color:#3087CC;font-size:13px;font-weight:500;">查看明细</a></td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium">物理与电子学院</td>
+                <td class="px-4 py-3 text-center">25</td>
+                <td class="px-4 py-3 text-center text-success font-medium">22</td>
+                <td class="px-4 py-3 text-center text-error">2</td>
+                <td class="px-4 py-3 text-center text-warning">1</td>
+                <td class="px-4 py-3 text-center"><span class="text-success font-medium">88.0%</span></td>
+                <td class="px-4 py-3 text-center">16</td>
+                <td class="px-4 py-3 text-center">9</td>
+                <td class="px-4 py-3 text-center"><a href="admin-college-detail.html?college=物理与电子学院" style="color:#3087CC;font-size:13px;font-weight:500;">查看明细</a></td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium">化学化工学院</td>
+                <td class="px-4 py-3 text-center">22</td>
+                <td class="px-4 py-3 text-center text-success font-medium">19</td>
+                <td class="px-4 py-3 text-center text-error">2</td>
+                <td class="px-4 py-3 text-center text-warning">1</td>
+                <td class="px-4 py-3 text-center"><span class="text-success font-medium">86.4%</span></td>
+                <td class="px-4 py-3 text-center">14</td>
+                <td class="px-4 py-3 text-center">8</td>
+                <td class="px-4 py-3 text-center"><a href="admin-college-detail.html?college=化学化工学院" style="color:#3087CC;font-size:13px;font-weight:500;">查看明细</a></td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition">
+                <td class="px-4 py-3 font-medium">文学与新闻传播学院</td>
+                <td class="px-4 py-3 text-center">18</td>
+                <td class="px-4 py-3 text-center text-success font-medium">16</td>
+                <td class="px-4 py-3 text-center text-error">1</td>
+                <td class="px-4 py-3 text-center text-warning">1</td>
+                <td class="px-4 py-3 text-center"><span class="text-success font-medium">88.9%</span></td>
+                <td class="px-4 py-3 text-center">12</td>
+                <td class="px-4 py-3 text-center">6</td>
+                <td class="px-4 py-3 text-center"><a href="admin-college-detail.html?college=文学与新闻传播学院" style="color:#3087CC;font-size:13px;font-weight:500;">查看明细</a></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="bg-gray-50 font-semibold">
+                <td class="px-4 py-3">合计</td>
+                <td class="px-4 py-3 text-center text-primary">286</td>
+                <td class="px-4 py-3 text-center text-success">250</td>
+                <td class="px-4 py-3 text-center text-error">22</td>
+                <td class="px-4 py-3 text-center text-warning">14</td>
+                <td class="px-4 py-3 text-center text-success">87.4%</td>
+                <td class="px-4 py-3 text-center">186</td>
+                <td class="px-4 py-3 text-center">100</td>
+                <td class="px-4 py-3 text-center text-text-muted">—</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Back Link -->
+      <div class="mt-6">
+        <a href="../index.html" class="text-sm text-text-muted hover:text-primary transition flex items-center gap-1">
+          <i class="fa-solid fa-arrow-left"></i>返回原型导航
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function setPeriod(btn) {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const customDates = document.getElementById('customDates');
+      if (btn.id === 'customPeriodBtn') {
+        customDates.classList.remove('hidden');
+      } else {
+        customDates.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

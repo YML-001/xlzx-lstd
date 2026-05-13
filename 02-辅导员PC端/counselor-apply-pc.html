@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新建申请 - 辅导员端 · 心理中心绿色通道</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @font-face { font-family: 'OPPOSans'; src: local('OPPOSans'); }
+        * { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; box-sizing: border-box; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 240px; min-height: 100vh;
+            background: #fff; border-right: 1px solid #C8CAD1;
+            position: fixed; top: 0; left: 0; z-index: 50;
+            display: flex; flex-direction: column; transition: transform 0.3s;
+        }
+        .sidebar-logo   { padding: 20px 20px 16px; border-bottom: 1px solid #f0f0f0; }
+        .sidebar-nav    { flex: 1; padding: 16px 12px; overflow-y: auto; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid #f0f0f0; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 16px; border-radius: 8px;
+            color: #696F7D; font-size: 14px; text-decoration: none;
+            margin-bottom: 4px; transition: all 0.2s; position: relative;
+        }
+        .nav-item:hover  { background: #E3F1F9; color: #3087CC; }
+        .nav-item.active { background: #E3F1F9; color: #3087CC; font-weight: 600; }
+        .nav-item i      { width: 20px; text-align: center; font-size: 15px; flex-shrink: 0; }
+
+        .nav-badge {
+            margin-left: auto; background: #DF2027; color: #fff;
+            font-size: 11px; font-weight: 700; min-width: 18px; height: 18px;
+            border-radius: 9px; display: flex; align-items: center;
+            justify-content: center; padding: 0 5px;
+        }
+
+        /* ── Main ── */
+        .main-content { margin-left: 240px; min-height: 100vh; background: #FAFAFA; }
+
+        /* ── Form elements ── */
+        .form-label { display: block; font-size: 13px; font-weight: 500; color: #3C444F; margin-bottom: 6px; }
+        .form-label .req { color: #DF2027; margin-left: 2px; }
+
+        .form-input, .form-select {
+            width: 100%; height: 40px;
+            border: 1px solid #C8CAD1; border-radius: 8px;
+            padding: 0 12px; font-size: 14px; color: #3C444F;
+            background: #fff; outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .form-input:focus, .form-select:focus {
+            border-color: #3087CC;
+            box-shadow: 0 0 0 3px rgba(48,135,204,0.12);
+        }
+        .form-input::placeholder { color: #C8CAD1; }
+        .form-input.readonly, .form-input[readonly] {
+            background: #F5F7FA; color: #696F7D; cursor: default;
+        }
+        .form-select {
+            appearance: none; cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%239096A2' stroke-width='1.5' d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px;
+        }
+        .form-textarea {
+            width: 100%; border: 1px solid #C8CAD1; border-radius: 8px;
+            padding: 10px 12px; font-size: 14px; color: #3C444F;
+            background: #fff; outline: none; resize: vertical; min-height: 128px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+            font-family: inherit;
+        }
+        .form-textarea:focus {
+            border-color: #3087CC;
+            box-shadow: 0 0 0 3px rgba(48,135,204,0.12);
+        }
+        .form-textarea::placeholder { color: #C8CAD1; }
+
+        /* ── Section card ── */
+        .section-card {
+            background: #fff; border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 22px 24px; margin-bottom: 18px;
+        }
+        .section-title {
+            font-size: 14px; font-weight: 600; color: #3C444F;
+            padding-left: 10px; border-left: 3px solid #3087CC; margin-bottom: 18px;
+        }
+
+        /* ── Radio ── */
+        .radio-option { display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #3C444F; }
+        .radio-option input[type="radio"] { display: none; }
+        .radio-dot {
+            width: 18px; height: 18px; border: 2px solid #C8CAD1; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; transition: border-color 0.15s; flex-shrink: 0;
+        }
+        .radio-option input:checked + .radio-dot { border-color: #3087CC; }
+        .radio-option input:checked + .radio-dot::after {
+            content: ''; width: 8px; height: 8px; background: #3087CC; border-radius: 50%;
+        }
+
+        /* ── Type cards ── */
+        .type-card {
+            flex: 1; border: 1.5px solid #C8CAD1; border-radius: 8px;
+            padding: 14px 16px; cursor: pointer; transition: all 0.15s;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .type-card:hover   { border-color: #3087CC; background: #F5FAFF; }
+        .type-card.selected { border-color: #3087CC; background: #E3F1F9; }
+        .type-icon {
+            width: 38px; height: 38px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .type-icon.blue  { background: #E3F1F9; color: #3087CC; }
+        .type-icon.green { background: #E8FCF4; color: #1BB975; }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 0 24px; height: 40px; background: #3087CC; color: #fff;
+            font-size: 14px; font-weight: 500; border-radius: 8px; border: none;
+            cursor: pointer; transition: background 0.15s;
+        }
+        .btn-primary:hover    { background: #006DAD; }
+        .btn-primary:disabled { background: #9CBFDA; cursor: not-allowed; }
+        .btn-secondary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 0 20px; height: 40px; background: #fff;
+            color: #696F7D; font-size: 14px; border-radius: 8px;
+            border: 1px solid #C8CAD1; cursor: pointer; text-decoration: none;
+            transition: all 0.15s;
+        }
+        .btn-secondary:hover { border-color: #3087CC; color: #3087CC; }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: #fff; border-radius: 10px; padding: 12px 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12); display: flex; align-items: center; gap: 10px;
+            z-index: 999; opacity: 0; transition: all 0.3s ease; pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+            .menu-btn { display: flex !important; }
+        }
+    </style>
+</head>
+<body class="bg-[#FAFAFA]">
+
+<!-- ════════════════════ SIDEBAR ════════════════════ -->
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-[#E3F1F9] flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-heart-pulse text-[#3087CC] text-base"></i>
+            </div>
+            <div>
+                <div class="text-[13px] font-bold text-[#3C444F] leading-tight">心理中心绿色通道</div>
+                <div class="text-[11px] text-[#9096A2] mt-0.5">辅导员端</div>
+            </div>
+        </div>
+    </div>
+    <nav class="sidebar-nav">
+        <a href="counselor-applications.html" class="nav-item">
+            <i class="fas fa-list-check"></i>
+            我的申请
+        </a>
+        <a href="counselor-apply-pc.html" class="nav-item active">
+            <i class="fas fa-file-circle-plus"></i>
+            新建申请
+        </a>
+        <a href="counselor-notifications-pc.html" class="nav-item">
+            <i class="fas fa-bell"></i>
+            消息通知
+            <span class="nav-badge">2</span>
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <a href="../index.html" class="flex items-center gap-2 text-xs text-[#9096A2] hover:text-[#3087CC] transition-colors mb-3 pb-3 border-b border-gray-100">
+            <i class="fas fa-home text-sm"></i>
+            <span>返回原型首页</span>
+        </a>
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-9 h-9 rounded-full bg-[#3087CC] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">张</div>
+            <div class="min-w-0">
+                <div class="text-sm font-semibold text-[#3C444F] truncate">张老师</div>
+                <div class="text-xs text-[#9096A2] truncate">计算机学院</div>
+            </div>
+        </div>
+        <a href="#" class="flex items-center gap-2 text-xs text-[#9096A2] hover:text-[#DF2027] transition-colors">
+            <i class="fas fa-arrow-right-from-bracket text-xs"></i>
+            退出登录
+        </a>
+    </div>
+</aside>
+
+<div id="overlay" class="fixed inset-0 bg-black/40 z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+<!-- ════════════════════ MAIN CONTENT ════════════════════ -->
+<div class="main-content">
+
+    <!-- Top bar -->
+    <header class="bg-white border-b border-[#C8CAD1]/40 px-6 py-3 flex items-center sticky top-0 z-30">
+        <button onclick="toggleSidebar()" class="menu-btn hidden w-8 h-8 items-center justify-center rounded-lg hover:bg-gray-100 text-[#696F7D] mr-3">
+            <i class="fas fa-bars text-sm"></i>
+        </button>
+        <nav class="text-sm text-[#9096A2] flex items-center gap-1.5">
+            <span class="hover:text-[#3087CC] cursor-pointer transition-colors">首页</span>
+            <i class="fas fa-chevron-right text-[10px]"></i>
+            <span class="text-[#3C444F] font-medium">新建申请</span>
+        </nav>
+    </header>
+
+    <!-- Page body -->
+    <main class="px-8 py-6">
+
+        <!-- Back link -->
+        <a href="../index.html" class="inline-flex items-center gap-1.5 text-sm text-[#9096A2] hover:text-[#3087CC] transition-colors mb-5">
+            <i class="fas fa-arrow-left text-xs"></i>
+            返回原型导航
+        </a>
+
+        <!-- Form wrapper -->
+        <div class="max-w-[860px]">
+
+            <!-- Page heading -->
+            <div class="mb-5">
+                <h1 class="text-[20px] font-bold text-[#3C444F]">新建绿色通道就诊申请</h1>
+                <p class="text-sm text-[#696F7D] mt-1">请如实填写学生就诊信息，提交后由心理中心审批</p>
+            </div>
+
+            <!-- ── Section 1: 学生基本信息 ── -->
+            <div class="section-card">
+                <div class="section-title">学生基本信息</div>
+                <div class="grid grid-cols-2 gap-x-5 gap-y-5">
+
+                    <!-- 姓名 -->
+                    <div>
+                        <label class="form-label">姓名<span class="req">*</span></label>
+                        <input type="text" class="form-input" placeholder="请输入学生姓名">
+                    </div>
+
+                    <!-- 性别 -->
+                    <div>
+                        <label class="form-label">性别<span class="req">*</span></label>
+                        <div class="flex items-center gap-6 h-[40px]">
+                            <label class="radio-option">
+                                <input type="radio" name="gender" value="male" checked>
+                                <span class="radio-dot"></span>
+                                男
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="gender" value="female">
+                                <span class="radio-dot"></span>
+                                女
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 年龄 -->
+                    <div>
+                        <label class="form-label">年龄<span class="req">*</span></label>
+                        <input type="number" class="form-input" placeholder="请输入年龄" min="16" max="45">
+                    </div>
+
+                    <!-- 年级 -->
+                    <div>
+                        <label class="form-label">年级<span class="req">*</span></label>
+                        <select class="form-select">
+                            <option value="" disabled selected>请选择年级</option>
+                            <option>大一</option>
+                            <option>大二</option>
+                            <option>大三</option>
+                            <option>大四</option>
+                            <option>研一</option>
+                            <option>研二</option>
+                            <option>研三</option>
+                            <option>博士</option>
+                        </select>
+                    </div>
+
+                    <!-- 学院 full-width -->
+                    <div class="col-span-2">
+                        <label class="form-label">学院<span class="req">*</span></label>
+                        <select class="form-select">
+                            <option value="" disabled selected>请选择所在学院</option>
+                            <option>计算机学院</option>
+                            <option>信息科学与工程学院</option>
+                            <option>商学院</option>
+                            <option>外国语学院</option>
+                            <option>数学与统计学院</option>
+                            <option>化学化工学院</option>
+                            <option>物理与电子学院</option>
+                            <option>材料科学与工程学院</option>
+                        </select>
+                    </div>
+
+                    <!-- 身份证号 full-width -->
+                    <div class="col-span-2">
+                        <label class="form-label">身份证号<span class="req">*</span></label>
+                        <input type="text" class="form-input" placeholder="请输入18位身份证号码" maxlength="18">
+                    </div>
+
+                    <!-- 联系方式 half-width -->
+                    <div>
+                        <label class="form-label">联系方式<span class="req">*</span></label>
+                        <input type="tel" class="form-input" placeholder="请输入学生手机号">
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Section 2: 就诊信息 ── -->
+            <div class="section-card">
+                <div class="section-title">就诊信息</div>
+                <div>
+                    <label class="form-label">就诊类型<span class="req">*</span></label>
+                    <div class="flex gap-4 mt-1">
+                        <div class="type-card selected" onclick="selectType('first', this)">
+                            <div class="type-icon blue"><i class="fas fa-user-plus"></i></div>
+                            <div>
+                                <div class="text-sm font-semibold text-[#3C444F]">首诊</div>
+                                <div class="text-xs text-[#9096A2] mt-0.5">首次就诊</div>
+                            </div>
+                            <i class="fas fa-check-circle text-[#3087CC] ml-auto hidden first-check"></i>
+                        </div>
+                        <div class="type-card" onclick="selectType('follow', this)">
+                            <div class="type-icon green"><i class="fas fa-rotate"></i></div>
+                            <div>
+                                <div class="text-sm font-semibold text-[#3C444F]">复诊</div>
+                                <div class="text-xs text-[#9096A2] mt-0.5">复诊随访</div>
+                            </div>
+                            <i class="fas fa-check-circle text-[#3087CC] ml-auto hidden follow-check"></i>
+                        </div>
+                    </div>
+
+                    <!-- 复诊提示 -->
+                    <div id="followHint" class="hidden mt-3 flex items-start gap-2 rounded-lg bg-[#FFF8EE] border border-[#FFE0A3] px-4 py-3">
+                        <i class="fas fa-circle-exclamation text-[#F29100] mt-0.5 text-sm flex-shrink-0"></i>
+                        <span class="text-sm text-[#8A5800]">请提醒学生携带之前就诊的病历资料</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Section 3: 辅导员信息 (readonly) ── -->
+            <div class="section-card">
+                <div class="section-title">辅导员信息</div>
+                <div class="grid grid-cols-2 gap-x-5 gap-y-5">
+                    <div>
+                        <label class="form-label">辅导员姓名</label>
+                        <input type="text" class="form-input readonly" value="张老师" readonly>
+                    </div>
+                    <div>
+                        <label class="form-label">所在学院</label>
+                        <input type="text" class="form-input readonly" value="计算机学院" readonly>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="form-label">联系方式</label>
+                        <input type="text" class="form-input readonly" value="138****5678" readonly>
+                    </div>
+                </div>
+                <p class="text-xs text-[#9096A2] mt-3 flex items-center gap-1">
+                    <i class="fas fa-lock text-[10px]"></i>
+                    以上信息由系统自动填写，无需修改
+                </p>
+            </div>
+
+            <!-- ── Section 4: 学生情况说明 ── -->
+            <div class="section-card">
+                <div class="section-title">学生情况说明</div>
+                <div>
+                    <label class="form-label">情况描述<span class="req">*</span></label>
+                    <textarea class="form-textarea" id="descTA" maxlength="150" rows="6"
+                        placeholder="请用最精简的语言描述学生症状表现，可包括学生主诉及他人观察，不超过150字"
+                        oninput="updateCounter()"></textarea>
+                    <div class="flex items-center justify-between mt-1.5">
+                        <p class="text-xs text-[#9096A2]">
+                            <i class="fas fa-circle-info text-[10px] mr-1"></i>
+                            包括学生主诉及他人观察
+                        </p>
+                        <span class="text-xs text-[#9096A2]"><span id="charCount">0</span>/150</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Notice box ── -->
+            <div class="rounded-lg bg-[#FFF8EE] border-l-4 border-[#F29100] px-5 py-4 mb-6">
+                <div class="flex items-center gap-2 mb-2">
+                    <i class="fas fa-triangle-exclamation text-[#F29100] text-sm"></i>
+                    <span class="text-sm font-semibold text-[#8A5800]">注意事项</span>
+                </div>
+                <p class="text-[13px] text-[#8A5800] leading-7">
+                    ① 就诊务必携带就诊人身份证<br>
+                    ② 复诊须携带之前就诊的病历资料<br>
+                    ③ 学生就诊须遵守相关法律法规
+                </p>
+            </div>
+
+            <!-- ── Action bar ── -->
+            <div class="flex items-center justify-end gap-3 pb-10">
+                <a href="counselor-applications.html" class="btn-secondary">
+                    <i class="fas fa-xmark text-sm"></i>
+                    取消
+                </a>
+                <button class="btn-primary" id="submitBtn" onclick="handleSubmit()">
+                    <i class="fas fa-paper-plane text-sm" id="submitIcon"></i>
+                    <span id="submitText">提交申请</span>
+                </button>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">
+    <div class="w-8 h-8 rounded-full bg-[#E8FCF4] flex items-center justify-center flex-shrink-0">
+        <i class="fas fa-check text-[#1BB975] text-sm"></i>
+    </div>
+    <div>
+        <div class="text-sm font-semibold text-[#3C444F]">申请提交成功</div>
+        <div class="text-xs text-[#9096A2] mt-0.5">正在跳转到申请列表…</div>
+    </div>
+</div>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('open');
+        document.getElementById('overlay').classList.toggle('hidden');
+    }
+
+    function selectType(type, el) {
+        document.querySelectorAll('.type-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('followHint').classList.toggle('hidden', type !== 'follow');
+    }
+
+    function updateCounter() {
+        const ta  = document.getElementById('descTA');
+        const cnt = document.getElementById('charCount');
+        const n   = ta.value.length;
+        cnt.textContent = n;
+        cnt.style.color = n >= 130 ? '#DF2027' : '#9096A2';
+    }
+
+    function handleSubmit() {
+        const btn  = document.getElementById('submitBtn');
+        const icon = document.getElementById('submitIcon');
+        const text = document.getElementById('submitText');
+        btn.disabled = true;
+        icon.className = 'fas fa-spinner fa-spin text-sm';
+        text.textContent = '提交中…';
+
+        setTimeout(() => {
+            btn.disabled = false;
+            icon.className = 'fas fa-check text-sm';
+            text.textContent = '提交成功';
+
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                window.location.href = 'counselor-applications.html';
+            }, 1500);
+        }, 1200);
+    }
+
+    // Init radio visual state
+    document.querySelectorAll('.radio-option').forEach(lbl => {
+        const inp = lbl.querySelector('input[type="radio"]');
+        const dot = lbl.querySelector('.radio-dot');
+        const sync = () => {
+            document.querySelectorAll('input[name="gender"]').forEach(r => {
+                r.closest('.radio-option').querySelector('.radio-dot')
+                    .style.borderColor = r.checked ? '#3087CC' : '#C8CAD1';
+            });
+        };
+        inp.addEventListener('change', sync);
+        sync();
+    });
+</script>
+</body>
+</html>

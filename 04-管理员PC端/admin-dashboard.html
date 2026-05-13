@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据概览 - 心理中心绿色通道管理系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @font-face {
+            font-family: 'OPPOSans';
+            src: local('OPPOSans');
+        }
+        * { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: #1E293B;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 40;
+            transition: transform 0.3s;
+        }
+
+        .main-content {
+            margin-left: 240px;
+            min-height: 100vh;
+            background: #FAFAFA;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #94A3B8;
+            font-size: 14px;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            color: #E2E8F0;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .nav-item.active {
+            color: #FFFFFF;
+            background: rgba(48,135,204,0.15);
+            border-left-color: #3087CC;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            margin-right: 12px;
+            font-size: 15px;
+        }
+
+        .stat-card {
+            background: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .stat-card.orange::before { background: #F29100; }
+        .stat-card.green::before { background: #1BB975; }
+        .stat-card.blue::before { background: #3087CC; }
+        .stat-card.red::before { background: #DF2027; }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .stat-icon.orange { background: #FFF5E5; color: #F29100; }
+        .stat-icon.green { background: #E8FCF4; color: #1BB975; }
+        .stat-icon.blue { background: #E3F1F9; color: #3087CC; }
+        .stat-icon.red { background: #FCE8EA; color: #DF2027; }
+
+        .chart-card {
+            background: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 24px;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 24px;
+            height: 180px;
+            padding-top: 20px;
+        }
+
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 36px;
+            background: #3087CC;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .bar:hover {
+            background: #006DAD;
+        }
+
+        .bar-value {
+            font-size: 12px;
+            color: #3C444F;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .bar-label {
+            font-size: 12px;
+            color: #9096A2;
+            margin-top: 8px;
+        }
+
+        .h-bar-chart .h-bar-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .h-bar-chart .h-bar-label {
+            width: 80px;
+            font-size: 13px;
+            color: #3C444F;
+            text-align: right;
+            padding-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .h-bar-chart .h-bar-track {
+            flex: 1;
+            height: 24px;
+            background: #F1F5F9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .h-bar-chart .h-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+
+        .h-bar-chart .h-bar-count {
+            width: 36px;
+            font-size: 13px;
+            color: #696F7D;
+            text-align: right;
+            padding-left: 8px;
+            flex-shrink: 0;
+        }
+
+        .table-container {
+            background: #FFFFFF;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead th {
+            background: #E3F1F9;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 500;
+            color: #3C444F;
+            white-space: nowrap;
+        }
+
+        .data-table tbody td {
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #3C444F;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .data-table tbody tr:hover {
+            background: #FAFBFC;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.pending { background: #FFF5E5; color: #F29100; }
+        .status-badge.approved { background: #E8FCF4; color: #1BB975; }
+        .status-badge.rejected { background: #FCE8EA; color: #DF2027; }
+
+        .action-link {
+            color: #3087CC;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .action-link:hover {
+            color: #006DAD;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                display: flex !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#FAFAFA]">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="p-5 border-b border-white/10">
+            <div class="text-white font-bold text-lg">心理中心</div>
+            <div class="text-[#94A3B8] text-sm mt-0.5">绿色通道</div>
+        </div>
+
+        <nav class="mt-4">
+            <a href="admin-dashboard.html" class="nav-item active">
+                <i class="fas fa-chart-pie"></i>
+                数据概览
+            </a>
+            <a href="admin-applications.html" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                申请管理
+            </a>
+            <a href="admin-statistics.html" class="nav-item">
+                <i class="fas fa-chart-bar"></i>
+                数据统计
+            </a>
+        </nav>
+        <a href="../index.html" class="flex items-center gap-2 px-5 py-2 mt-3 text-[#94A3B8] text-xs hover:text-white transition-colors">
+            <i class="fas fa-home"></i>
+            <span>返回原型首页</span>
+        </a>
+
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-[#3087CC] flex items-center justify-center text-white text-xs font-medium">李</div>
+                    <span class="text-white text-sm">李主任</span>
+                </div>
+                <a href="#" class="text-[#94A3B8] text-xs hover:text-white transition-colors">退出登录</a>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Bar -->
+        <header class="bg-white border-b border-[#C8CAD1]/30 px-6 py-3 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="menu-toggle hidden w-8 h-8 items-center justify-center rounded-lg hover:bg-gray-100 text-[#696F7D]">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav class="text-sm text-[#9096A2]">
+                    <span>首页</span>
+                    <span class="mx-2">&gt;</span>
+                    <span class="text-[#3C444F]">数据概览</span>
+                </nav>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="relative w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-[#696F7D]">
+                    <i class="fas fa-bell text-base"></i>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-[#DF2027] rounded-full"></span>
+                </button>
+                <div class="flex items-center gap-2 cursor-pointer">
+                    <div class="w-8 h-8 rounded-full bg-[#3087CC] flex items-center justify-center text-white text-xs font-medium">李</div>
+                    <span class="text-sm text-[#3C444F]">李主任</span>
+                    <i class="fas fa-chevron-down text-xs text-[#9096A2]"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="p-6 max-w-[1440px] mx-auto">
+            <!-- Back link -->
+            <a href="../index.html" class="inline-flex items-center gap-1 text-sm text-[#9096A2] hover:text-[#3087CC] mb-4 transition-colors">
+                <i class="fas fa-arrow-left text-xs"></i>
+                返回原型导航
+            </a>
+
+            <!-- Stats Row -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="stat-card orange">
+                    <div class="stat-icon orange">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-[#3C444F]">8</div>
+                        <div class="text-sm text-[#696F7D]">待审批</div>
+                    </div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-icon green">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-[#3C444F]">3</div>
+                        <div class="text-sm text-[#696F7D]">今日通过</div>
+                    </div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-icon blue">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-[#3C444F]">26</div>
+                        <div class="text-sm text-[#696F7D]">本月申请</div>
+                    </div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-icon red">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-[#3C444F]">2</div>
+                        <div class="text-sm text-[#696F7D]">本月驳回</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-6">
+                <!-- Monthly Trend Bar Chart -->
+                <div class="chart-card lg:col-span-3">
+                    <h3 class="text-base font-medium text-[#3C444F] mb-4">月度申请趋势</h3>
+                    <div class="bar-chart">
+                        <div class="bar-item">
+                            <div class="bar-value">8</div>
+                            <div class="bar" style="height: 35%"></div>
+                            <div class="bar-label">12月</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-value">12</div>
+                            <div class="bar" style="height: 52%"></div>
+                            <div class="bar-label">1月</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-value">10</div>
+                            <div class="bar" style="height: 43%"></div>
+                            <div class="bar-label">2月</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-value">15</div>
+                            <div class="bar" style="height: 65%"></div>
+                            <div class="bar-label">3月</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-value">18</div>
+                            <div class="bar" style="height: 78%"></div>
+                            <div class="bar-label">4月</div>
+                        </div>
+                        <div class="bar-item">
+                            <div class="bar-value">23</div>
+                            <div class="bar" style="height: 100%"></div>
+                            <div class="bar-label">5月</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- College Distribution -->
+                <div class="chart-card lg:col-span-2">
+                    <h3 class="text-base font-medium text-[#3C444F] mb-4">学院分布</h3>
+                    <div class="h-bar-chart">
+                        <div class="h-bar-item">
+                            <div class="h-bar-label">计算机学院</div>
+                            <div class="h-bar-track">
+                                <div class="h-bar-fill" style="width: 100%; background: #3087CC;"></div>
+                            </div>
+                            <div class="h-bar-count">7</div>
+                        </div>
+                        <div class="h-bar-item">
+                            <div class="h-bar-label">商学院</div>
+                            <div class="h-bar-track">
+                                <div class="h-bar-fill" style="width: 71%; background: #9CBFDA;"></div>
+                            </div>
+                            <div class="h-bar-count">5</div>
+                        </div>
+                        <div class="h-bar-item">
+                            <div class="h-bar-label">文学院</div>
+                            <div class="h-bar-track">
+                                <div class="h-bar-fill" style="width: 57%; background: #1BB975;"></div>
+                            </div>
+                            <div class="h-bar-count">4</div>
+                        </div>
+                        <div class="h-bar-item">
+                            <div class="h-bar-label">材料学院</div>
+                            <div class="h-bar-track">
+                                <div class="h-bar-fill" style="width: 43%; background: #F29100;"></div>
+                            </div>
+                            <div class="h-bar-count">3</div>
+                        </div>
+                        <div class="h-bar-item">
+                            <div class="h-bar-label">土木学院</div>
+                            <div class="h-bar-track">
+                                <div class="h-bar-fill" style="width: 29%; background: #006DAD;"></div>
+                            </div>
+                            <div class="h-bar-count">2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Applications Table -->
+            <div class="table-container">
+                <div class="px-6 py-4 flex items-center justify-between border-b border-[#F1F5F9]">
+                    <h3 class="text-base font-medium text-[#3C444F]">最新申请</h3>
+                    <a href="admin-applications.html" class="action-link text-sm">查看全部 <i class="fas fa-arrow-right text-xs ml-1"></i></a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>学生姓名</th>
+                                <th>学院</th>
+                                <th>就诊类型</th>
+                                <th>提交人</th>
+                                <th>提交时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>张三</td>
+                                <td>计算机学院</td>
+                                <td>心理咨询</td>
+                                <td>王辅导员</td>
+                                <td>2025-05-12 14:30</td>
+                                <td><span class="status-badge pending">待审批</span></td>
+                                <td><a class="action-link" href="admin-applications.html">审批</a></td>
+                            </tr>
+                            <tr>
+                                <td>李四</td>
+                                <td>商学院</td>
+                                <td>危机干预</td>
+                                <td>张辅导员</td>
+                                <td>2025-05-12 11:20</td>
+                                <td><span class="status-badge pending">待审批</span></td>
+                                <td><a class="action-link" href="admin-applications.html">审批</a></td>
+                            </tr>
+                            <tr>
+                                <td>王五</td>
+                                <td>文学院</td>
+                                <td>心理咨询</td>
+                                <td>陈辅导员</td>
+                                <td>2025-05-11 16:45</td>
+                                <td><span class="status-badge approved">已通过</span></td>
+                                <td><a class="action-link" href="admin-applications.html">查看</a></td>
+                            </tr>
+                            <tr>
+                                <td>赵六</td>
+                                <td>材料学院</td>
+                                <td>精神科就诊</td>
+                                <td>刘辅导员</td>
+                                <td>2025-05-11 09:15</td>
+                                <td><span class="status-badge approved">已通过</span></td>
+                                <td><a class="action-link" href="admin-applications.html">查看</a></td>
+                            </tr>
+                            <tr>
+                                <td>钱七</td>
+                                <td>土木学院</td>
+                                <td>心理咨询</td>
+                                <td>周辅导员</td>
+                                <td>2025-05-10 15:00</td>
+                                <td><span class="status-badge rejected">已驳回</span></td>
+                                <td><a class="action-link" href="admin-applications.html">查看</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sidebar overlay for mobile -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/40 z-30 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('hidden');
+        }
+    </script>
+</body>
+</html>

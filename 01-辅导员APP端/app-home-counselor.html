@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>辅导员首页 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary:      '#3087CC',
+            'primary-light': '#E3F1F9',
+            'primary-dark':  '#006DAD',
+            success:      '#1BB975',
+            'success-bg':   '#E8FCF4',
+            'success-border':'#A7F3D0',
+            warning:      '#F29100',
+            'warning-bg':   '#FFF5E5',
+            'warning-border':'#FFE0B3',
+            error:        '#DF2027',
+            'error-bg':     '#FCE8EA',
+            'error-border':  '#F6BCBE',
+            'text-primary': '#3C444F',
+            'text-secondary':'#696F7D',
+            'text-muted':   '#9096A2',
+            placeholder:  '#ABB0BA',
+            border:       '#C8CAD1',
+            'page-bg':      '#FAFAFA',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+            top:  '0 -1px 4px rgba(0,0,0,0.06)',
+          },
+          borderRadius: {
+            card: '8px',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { background: #E3F1F9; }
+    body { font-family: 'OPPOSans', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; background: #FAFAFA; color: #3C444F; }
+
+    /* 手机壳容器 */
+    .phone-shell {
+      width: 375px; min-height: 100vh; margin: 0 auto; position: relative;
+      background: #FAFAFA; box-shadow: 0 0 40px rgba(0,0,0,0.12);
+    }
+    @media (min-width: 500px) {
+      html { display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+      .phone-shell { min-height: 812px; border-radius: 32px; overflow: hidden; margin: 20px auto; border: 8px solid #1a1a1a; }
+    }
+    @media (max-width: 499px) {
+      .phone-shell { width: 100%; }
+    }
+
+    /* 快捷操作卡片悬停 */
+    .action-card { transition: all 150ms ease; }
+    .action-card:active { transform: scale(0.96); opacity: 0.85; }
+
+    /* 申请卡片 */
+    .app-card { transition: all 150ms ease; }
+    .app-card:active { background: #F8F8F8; }
+
+    /* 底部安全区 */
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+  </style>
+</head>
+<body>
+  <div class="phone-shell flex flex-col">
+
+    <!-- 主内容区（可滚动） -->
+    <div class="flex-1 overflow-y-auto pb-6">
+
+      <!-- 顶部头部 -->
+      <div class="px-4 pt-12 pb-4 bg-white">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-text-secondary">上午好</p>
+            <h1 class="text-xl font-bold text-text-primary mt-0.5">你好，张老师</h1>
+          </div>
+          <a href="app-notifications.html" class="relative w-11 h-11 flex items-center justify-center">
+            <i class="fa-regular fa-bell text-xl text-text-secondary"></i>
+            <span class="absolute top-2 right-2.5 w-2 h-2 bg-error rounded-full"></span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 快捷操作 1x3 -->
+      <div class="px-4 mt-4">
+        <div class="grid grid-cols-3 gap-3">
+          <!-- 新建申请 -->
+          <a href="app-apply.html" class="action-card bg-white rounded-card shadow-card p-4 flex flex-col items-center text-center no-underline">
+            <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center mb-2">
+              <i class="fa-solid fa-file-circle-plus text-primary text-lg"></i>
+            </div>
+            <span class="text-sm font-medium text-text-primary">新建申请</span>
+          </a>
+          <!-- 我的申请 -->
+          <a href="app-my-applications.html" class="action-card bg-white rounded-card shadow-card p-4 flex flex-col items-center text-center no-underline">
+            <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center mb-2">
+              <i class="fa-solid fa-list-check text-primary text-lg"></i>
+            </div>
+            <span class="text-sm font-medium text-text-primary">我的申请</span>
+          </a>
+          <!-- 消息通知 -->
+          <a href="app-notifications.html" class="action-card bg-white rounded-card shadow-card p-4 flex flex-col items-center text-center no-underline">
+            <div class="w-12 h-12 rounded-full bg-primary-light flex items-center justify-center mb-2">
+              <i class="fa-solid fa-bell text-primary text-lg"></i>
+            </div>
+            <span class="text-sm font-medium text-text-primary">消息通知</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 统计横幅卡片 -->
+      <div class="px-4 mt-4">
+        <div class="rounded-card p-4 text-white" style="background: linear-gradient(135deg, #3087CC 0%, #006DAD 100%);">
+          <p class="text-sm opacity-90 mb-3">本月申请统计</p>
+          <div class="flex items-center justify-between">
+            <div class="flex-1 text-center">
+              <p class="text-2xl font-bold">3</p>
+              <p class="text-xs opacity-80 mt-1">待审核</p>
+            </div>
+            <div class="w-px h-8 bg-white/30"></div>
+            <div class="flex-1 text-center">
+              <p class="text-2xl font-bold">5</p>
+              <p class="text-xs opacity-80 mt-1">已通过</p>
+            </div>
+            <div class="w-px h-8 bg-white/30"></div>
+            <div class="flex-1 text-center">
+              <p class="text-2xl font-bold">1</p>
+              <p class="text-xs opacity-80 mt-1">已驳回</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 近期申请 -->
+      <div class="px-4 mt-5">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-bold text-text-primary">近期申请</h2>
+          <a href="app-my-applications.html" class="text-sm text-primary no-underline">查看全部 &gt;</a>
+        </div>
+
+        <div class="space-y-3">
+          <!-- 卡片 1：待审核 -->
+          <a href="app-application-detail.html" class="app-card block bg-white rounded-card shadow-card p-4 no-underline">
+            <div class="flex items-start justify-between">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-[15px] font-medium text-text-primary">李明</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border"
+                        style="color:#F29100; background:#FFF5E5; border-color:#FFE0B3;">待审核</span>
+                </div>
+                <p class="text-sm text-text-secondary mt-1">信息科学与工程学院</p>
+              </div>
+              <span class="text-xs text-text-muted whitespace-nowrap ml-2 mt-0.5">2026-05-12</span>
+            </div>
+          </a>
+
+          <!-- 卡片 2：已通过 -->
+          <a href="app-application-detail.html" class="app-card block bg-white rounded-card shadow-card p-4 no-underline">
+            <div class="flex items-start justify-between">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-[15px] font-medium text-text-primary">王华</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border"
+                        style="color:#1BB975; background:#E8FCF4; border-color:#A7F3D0;">已通过</span>
+                </div>
+                <p class="text-sm text-text-secondary mt-1">计算机学院</p>
+              </div>
+              <span class="text-xs text-text-muted whitespace-nowrap ml-2 mt-0.5">2026-05-10</span>
+            </div>
+          </a>
+
+          <!-- 卡片 3：已驳回 -->
+          <a href="app-application-detail.html" class="app-card block bg-white rounded-card shadow-card p-4 no-underline">
+            <div class="flex items-start justify-between">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <span class="text-[15px] font-medium text-text-primary">陈静</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border"
+                        style="color:#DF2027; background:#FCE8EA; border-color:#F6BCBE;">已驳回</span>
+                </div>
+                <p class="text-sm text-text-secondary mt-1">外国语学院</p>
+              </div>
+              <span class="text-xs text-text-muted whitespace-nowrap ml-2 mt-0.5">2026-05-08</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- 返回原型导航 -->
+      <div class="px-4 mt-6 mb-4">
+        <a href="../index.html" class="inline-flex items-center gap-1.5 text-sm text-text-muted no-underline hover:text-primary transition-colors">
+          <i class="fa-solid fa-arrow-left text-xs"></i>
+          <span>返回原型导航</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:16px;bottom:16px;z-index:9999;width:36px;height:36px;background:#3087CC;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:14px;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house"></i></a>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>心理中心绿色通道 · 原型导航</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'OPPOSans',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;background:#f5f7fa;color:#3C444F;min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+/* Hero */
+.hero{background:#fff;border-bottom:1px solid #E3F1F9;padding:56px 40px 44px;text-align:center}
+.hero-icon{width:64px;height:64px;background:linear-gradient(135deg,#3087CC,#006DAD);border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:30px;color:#fff;margin-bottom:20px;box-shadow:0 4px 16px rgba(48,135,204,0.25)}
+.hero h1{font-size:28px;font-weight:800;margin-bottom:10px;color:#3C444F}
+.hero p{font-size:15px;color:#696F7D;max-width:620px;margin:0 auto 20px;line-height:1.7}
+.hero-badges{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:500}
+.hero-badge.doc{background:#E3F1F9;color:#3087CC}
+.hero-badge.design{background:#fff;border:1px solid #ECEFF4;color:#696F7D}
+.hero-stats{display:flex;justify-content:center;gap:44px}
+.hero-stat{text-align:center}
+.hero-stat .num{font-size:32px;font-weight:800;color:#3087CC}
+.hero-stat .label{font-size:12px;color:#9096A2;margin-top:4px}
+
+/* Container */
+.container{max-width:1100px;margin:0 auto;padding:40px 24px 60px}
+.section-title{font-size:20px;font-weight:700;color:#3C444F;margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.section-title i{font-size:20px;color:#3087CC}
+
+/* Portal Cards - 2x2 grid */
+.portal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:48px}
+.portal-card{background:#fff;border-radius:16px;border:1px solid #ECEFF4;overflow:hidden;transition:all .2s;display:block}
+.portal-card:hover{border-color:#3087CC;box-shadow:0 4px 20px rgba(48,135,204,0.12);transform:translateY(-2px)}
+.portal-header{padding:24px 24px 14px;display:flex;align-items:center;gap:14px}
+.portal-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.portal-icon.admin{background:#E3F1F9;color:#3087CC}
+.portal-icon.counselor{background:#E8FCF4;color:#1BB975}
+.portal-icon.mobile{background:#FFF5E5;color:#F29100}
+.portal-info h3{font-size:17px;font-weight:700;color:#3C444F}
+.portal-info p{font-size:13px;color:#9096A2;margin-top:2px}
+.portal-body{padding:0 24px 20px}
+.portal-links{display:flex;flex-wrap:wrap;gap:6px}
+.plink{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:#F5F7FA;border:1px solid #ECEFF4;border-radius:6px;font-size:12px;color:#696F7D;transition:all .15s}
+.plink:hover{background:#E3F1F9;border-color:#BADEF3;color:#3087CC}
+.plink i{font-size:13px}
+
+/* Page Map */
+.page-map{background:#fff;border-radius:16px;border:1px solid #ECEFF4;overflow:hidden;margin-bottom:48px}
+.map-header{background:#F5F7FA;padding:14px 24px;border-bottom:1px solid #ECEFF4;font-size:15px;font-weight:700;color:#3C444F;display:flex;align-items:center;gap:8px}
+.map-header i{font-size:17px;color:#3087CC}
+.map-header .count{margin-left:auto;font-size:12px;font-weight:500;color:#9096A2;background:#ECEFF4;padding:2px 8px;border-radius:10px}
+.map-section{padding:18px 24px;border-bottom:1px solid #F5F7FA}
+.map-section:last-child{border-bottom:none}
+.map-section h4{font-size:14px;font-weight:600;color:#3C444F;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.map-section h4 i{font-size:15px;color:#9096A2}
+.map-cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+.map-link{display:flex;align-items:center;gap:6px;padding:5px 0;font-size:13px;color:#3087CC;transition:color .15s}
+.map-link:hover{color:#006DAD}
+.map-link .num{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#E3F1F9;font-size:11px;font-weight:600;color:#3087CC;flex-shrink:0}
+
+/* Business Flow */
+.flow-section{padding:18px 24px;border-bottom:1px solid #F5F7FA}
+.flow-section:last-child{border-bottom:none}
+.flow-section h4{font-size:14px;font-weight:600;color:#3C444F;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.flow-section h4 i{font-size:15px;color:#9096A2}
+.flow-text{font-size:14px;color:#696F7D;line-height:1.8}
+.flow-text strong{color:#3C444F}
+.flow-arrow{display:inline-block;margin:0 4px;color:#BADEF3}
+
+/* Footer */
+.footer{text-align:center;padding:24px;font-size:13px;color:#9096A2}
+
+@media(max-width:900px){.portal-grid{grid-template-columns:1fr}}
+@media(max-width:700px){
+  .hero{padding:40px 20px 32px}
+  .hero h1{font-size:22px}
+  .hero-stats{gap:24px}
+  .hero-stat .num{font-size:24px}
+  .map-cols{grid-template-columns:1fr}
+  .container{padding:24px 16px 40px}
+}
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+  <h1>心理中心绿色通道 · 原型导航</h1>
+  <p>中南大学心理健康教育中心绿色通道系统，覆盖辅导员填报申请、心理中心审批全流程。<br>辅导员 APP 端 + 辅导员 PC 端 + 管理员 APP 端 + 管理员 PC 端，四视角完整覆盖。</p>
+  <div class="hero-badges">
+    <a href="05-文档资料/design-system.md" class="hero-badge doc"><i class="fa-solid fa-book"></i> 设计规范文档</a>
+    <span class="hero-badge design"><i class="fa-solid fa-palette"></i> OPPOSans · 中南主色体系</span>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="num">22</div>
+      <div class="label">HTML页面</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">4</div>
+      <div class="label">视角端</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">2</div>
+      <div class="label">核心角色</div>
+    </div>
+    <div class="hero-stat">
+      <div class="num">100%</div>
+      <div class="label">交互闭环</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Portal Cards -->
+  <div class="section-title"><i class="fa-solid fa-table-cells-large"></i> 快速入口</div>
+  <div class="portal-grid">
+
+    <!-- 辅导员 APP 端 -->
+    <a class="portal-card" href="01-辅导员APP端/app-home-counselor.html">
+      <div class="portal-header">
+        <div class="portal-icon counselor"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <div class="portal-info">
+          <h3>辅导员 APP 端</h3>
+          <p>6页 · iOS风格 · 移动端</p>
+        </div>
+      </div>
+      <div class="portal-body">
+        <div class="portal-links">
+          <span class="plink"><i class="fa-solid fa-house"></i> 辅导员首页</span>
+          <span class="plink"><i class="fa-solid fa-file-circle-plus"></i> 新建申请</span>
+          <span class="plink"><i class="fa-solid fa-list-check"></i> 我的申请</span>
+          <span class="plink"><i class="fa-solid fa-file-lines"></i> 申请详情</span>
+          <span class="plink"><i class="fa-solid fa-pen-to-square"></i> 修改申请</span>
+          <span class="plink"><i class="fa-solid fa-bell"></i> 消息通知</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 辅导员 PC 端 -->
+    <a class="portal-card" href="02-辅导员PC端/counselor-applications.html">
+      <div class="portal-header">
+        <div class="portal-icon counselor"><i class="fa-solid fa-desktop"></i></div>
+        <div class="portal-info">
+          <h3>辅导员 PC 端</h3>
+          <p>4页 · 侧边栏 + 表格/表单</p>
+        </div>
+      </div>
+      <div class="portal-body">
+        <div class="portal-links">
+          <span class="plink"><i class="fa-solid fa-list-check"></i> 我的申请</span>
+          <span class="plink"><i class="fa-solid fa-file-circle-plus"></i> 新建申请</span>
+          <span class="plink"><i class="fa-solid fa-file-lines"></i> 申请详情</span>
+          <span class="plink"><i class="fa-solid fa-bell"></i> 消息通知</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 管理员 APP 端 -->
+    <a class="portal-card" href="03-管理员APP端/app-home-admin.html">
+      <div class="portal-header">
+        <div class="portal-icon mobile"><i class="fa-solid fa-tablet-screen-button"></i></div>
+        <div class="portal-info">
+          <h3>管理员 APP 端</h3>
+          <p>6页 · iOS风格 · 移动端</p>
+        </div>
+      </div>
+      <div class="portal-body">
+        <div class="portal-links">
+          <span class="plink"><i class="fa-solid fa-gauge-high"></i> 管理员首页</span>
+          <span class="plink"><i class="fa-solid fa-clipboard-check"></i> 待审批</span>
+          <span class="plink"><i class="fa-solid fa-stamp"></i> 审批详情</span>
+          <span class="plink"><i class="fa-solid fa-clock-rotate-left"></i> 历史审批</span>
+          <span class="plink"><i class="fa-solid fa-chart-pie"></i> 数据统计</span>
+          <span class="plink"><i class="fa-solid fa-user-gear"></i> 个人中心</span>
+        </div>
+      </div>
+    </a>
+
+    <!-- 管理员 PC 端 -->
+    <a class="portal-card" href="04-管理员PC端/admin-dashboard.html">
+      <div class="portal-header">
+        <div class="portal-icon admin"><i class="fa-solid fa-desktop"></i></div>
+        <div class="portal-info">
+          <h3>管理员 PC 端</h3>
+          <p>6页 · 侧边栏 + 表格/表单</p>
+        </div>
+      </div>
+      <div class="portal-body">
+        <div class="portal-links">
+          <span class="plink"><i class="fa-solid fa-chart-line"></i> 数据概览</span>
+          <span class="plink"><i class="fa-solid fa-folder-open"></i> 申请管理</span>
+          <span class="plink"><i class="fa-solid fa-file-signature"></i> 申请详情审批</span>
+          <span class="plink"><i class="fa-solid fa-chart-column"></i> 数据统计</span>
+          <span class="plink"><i class="fa-solid fa-magnifying-glass-chart"></i> 学院明细</span>
+          <span class="plink"><i class="fa-solid fa-file-word"></i> 导出预览</span>
+        </div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Page Map -->
+  <div class="section-title"><i class="fa-solid fa-sitemap"></i> 页面地图</div>
+
+  <!-- 辅导员 APP 端 -->
+  <div class="page-map">
+    <div class="map-header">
+      <i class="fa-solid fa-mobile-screen-button"></i>
+      辅导员 APP 端
+      <span class="count">6页</span>
+    </div>
+    <div class="map-section">
+      <h4><i class="fa-solid fa-folder"></i> 申请管理</h4>
+      <div class="map-cols">
+        <a class="map-link" href="01-辅导员APP端/app-home-counselor.html">
+          <span class="num">01</span> 辅导员首页（申请概览+快捷操作）
+        </a>
+        <a class="map-link" href="01-辅导员APP端/app-apply.html">
+          <span class="num">02</span> 新建就诊申请
+        </a>
+        <a class="map-link" href="01-辅导员APP端/app-my-applications.html">
+          <span class="num">03</span> 我的申请列表
+        </a>
+        <a class="map-link" href="01-辅导员APP端/app-application-detail.html">
+          <span class="num">04</span> 申请详情（状态时间线）
+        </a>
+        <a class="map-link" href="01-辅导员APP端/app-application-edit.html">
+          <span class="num">05</span> 修改被驳回申请
+        </a>
+        <a class="map-link" href="01-辅导员APP端/app-notifications.html">
+          <span class="num">06</span> 消息通知
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 辅导员 PC 端 -->
+  <div class="page-map">
+    <div class="map-header">
+      <i class="fa-solid fa-desktop"></i>
+      辅导员 PC 端
+      <span class="count">4页</span>
+    </div>
+    <div class="map-section">
+      <h4><i class="fa-solid fa-folder"></i> 申请填报</h4>
+      <div class="map-cols">
+        <a class="map-link" href="02-辅导员PC端/counselor-applications.html">
+          <span class="num">01</span> 我的申请列表（筛选+导出）
+        </a>
+        <a class="map-link" href="02-辅导员PC端/counselor-apply-pc.html">
+          <span class="num">02</span> 新建就诊申请
+        </a>
+        <a class="map-link" href="02-辅导员PC端/counselor-application-detail-pc.html">
+          <span class="num">03</span> 申请详情（审批流程+导出）
+        </a>
+        <a class="map-link" href="02-辅导员PC端/counselor-notifications-pc.html">
+          <span class="num">04</span> 消息通知
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理员 APP 端 -->
+  <div class="page-map">
+    <div class="map-header">
+      <i class="fa-solid fa-tablet-screen-button"></i>
+      管理员 APP 端
+      <span class="count">6页</span>
+    </div>
+    <div class="map-section">
+      <h4><i class="fa-solid fa-folder"></i> 审批管理</h4>
+      <div class="map-cols">
+        <a class="map-link" href="03-管理员APP端/app-home-admin.html">
+          <span class="num">01</span> 管理员首页（待办+数据概览）
+        </a>
+        <a class="map-link" href="03-管理员APP端/app-pending-review.html">
+          <span class="num">02</span> 待审批申请列表
+        </a>
+        <a class="map-link" href="03-管理员APP端/app-review-detail.html">
+          <span class="num">03</span> 审批操作页
+        </a>
+        <a class="map-link" href="03-管理员APP端/app-review-history.html">
+          <span class="num">04</span> 历史审批记录
+        </a>
+        <a class="map-link" href="03-管理员APP端/app-statistics-mobile.html">
+          <span class="num">05</span> 移动端数据统计
+        </a>
+        <a class="map-link" href="03-管理员APP端/app-profile.html">
+          <span class="num">06</span> 个人中心
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 管理员 PC 端 -->
+  <div class="page-map">
+    <div class="map-header">
+      <i class="fa-solid fa-desktop"></i>
+      管理员 PC 端
+      <span class="count">6页</span>
+    </div>
+    <div class="map-section">
+      <h4><i class="fa-solid fa-folder"></i> 数据与审批</h4>
+      <div class="map-cols">
+        <a class="map-link" href="04-管理员PC端/admin-dashboard.html">
+          <span class="num">01</span> 数据仪表盘
+        </a>
+        <a class="map-link" href="04-管理员PC端/admin-applications.html">
+          <span class="num">02</span> 申请管理列表（搜索筛选+批量导出）
+        </a>
+        <a class="map-link" href="04-管理员PC端/admin-application-detail.html">
+          <span class="num">03</span> 申请详情与审批操作
+        </a>
+        <a class="map-link" href="04-管理员PC端/admin-statistics.html">
+          <span class="num">04</span> 数据统计报表
+        </a>
+        <a class="map-link" href="04-管理员PC端/admin-college-detail.html">
+          <span class="num">05</span> 学院申请明细（下钻）
+        </a>
+        <a class="map-link" href="04-管理员PC端/admin-export-preview.html">
+          <span class="num">06</span> 导出模板预览（Word申请表示意）
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Flow -->
+  <div class="section-title"><i class="fa-solid fa-diagram-project"></i> 业务流程</div>
+  <div class="page-map">
+    <div class="map-header">
+      <i class="fa-solid fa-arrow-right-arrow-left"></i>
+      核心流程说明
+      <span class="count">3个流程图</span>
+    </div>
+
+    <div class="flow-section">
+      <h4><i class="fa-solid fa-user-tie"></i> 辅导员申请流程</h4>
+      <div class="flow-text">
+        <strong>辅导员填报学生信息</strong>（APP端或PC端均可提交）
+        <span class="flow-arrow">→</span>提交申请
+        <span class="flow-arrow">→</span>心理中心受理
+        <span class="flow-arrow">→</span>审批通过/驳回
+        <span class="flow-arrow">→</span>驳回时：辅导员修改后重新提交
+        <span class="flow-arrow">→</span>通过后：导出申请表送达医院
+      </div>
+      <a href="06-业务流程图/flow-counselor-apply.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 14px;background:#E3F1F9;border:1px solid #BADEF3;border-radius:6px;font-size:13px;color:#3087CC;font-weight:500;transition:all .15s;text-decoration:none;" onmouseenter="this.style.background='#3087CC';this.style.color='#fff'" onmouseleave="this.style.background='#E3F1F9';this.style.color='#3087CC'"><i class="fa-solid fa-diagram-project"></i> 查看完整流程图</a>
+    </div>
+
+    <div class="flow-section">
+      <h4><i class="fa-solid fa-user-shield"></i> 管理员审批流程</h4>
+      <div class="flow-text">
+        收到申请通知
+        <span class="flow-arrow">→</span>查看完整申请信息
+        <span class="flow-arrow">→</span>选择<strong>通过</strong>（填写编号）或<strong>驳回</strong>（填写驳回原因）
+        <span class="flow-arrow">→</span>通过：可导出申请表
+        <span class="flow-arrow">→</span>驳回：系统通知辅导员修改
+      </div>
+      <a href="06-业务流程图/flow-admin-review.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 14px;background:#E3F1F9;border:1px solid #BADEF3;border-radius:6px;font-size:13px;color:#3087CC;font-weight:500;transition:all .15s;text-decoration:none;" onmouseenter="this.style.background='#3087CC';this.style.color='#fff'" onmouseleave="this.style.background='#E3F1F9';this.style.color='#3087CC'"><i class="fa-solid fa-diagram-project"></i> 查看完整流程图</a>
+    </div>
+
+    <div class="flow-section">
+      <h4><i class="fa-solid fa-file-export"></i> 数据导出流程</h4>
+      <div class="flow-text">
+        在申请管理列表中，已通过申请可<strong>单独导出申请表</strong>；批量选择后点击<strong>批量导出</strong>，可选择导出列表数据（Excel格式）或导出申请表（Word格式）
+      </div>
+      <a href="06-业务流程图/flow-export.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 14px;background:#E3F1F9;border:1px solid #BADEF3;border-radius:6px;font-size:13px;color:#3087CC;font-weight:500;transition:all .15s;text-decoration:none;" onmouseenter="this.style.background='#3087CC';this.style.color='#fff'" onmouseleave="this.style.background='#E3F1F9';this.style.color='#3087CC'"><i class="fa-solid fa-diagram-project"></i> 查看完整流程图</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  学工系统 · 心理中心绿色通道模块 · 原型 v3.0 · 共 22 页 · 辅导员APP端 6页 + 辅导员PC端 4页 + 管理员APP端 6页 + 管理员PC端 6页
+</div>
+
+</body>
+</html>
