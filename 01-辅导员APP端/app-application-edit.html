@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>修改申请 - 心理中心绿色通道</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: { DEFAULT: '#3087CC', light: '#E3F1F9', dark: '#006DAD' },
+            brand: { red: '#DF2027' },
+            success: { DEFAULT: '#1BB975', light: '#E8FCF4' },
+            warning: { DEFAULT: '#F29100', light: '#FFF5E5' },
+            error: { DEFAULT: '#DF2027', light: '#FCE8EA' },
+            txt: { primary: '#3C444F', secondary: '#696F7D', muted: '#9096A2' },
+            placeholder: '#ABB0BA',
+            border: '#C8CAD1',
+            bg: '#FAFAFA',
+            card: '#FFFFFF',
+          },
+          fontFamily: {
+            sans: ["'OPPOSans'", '-apple-system', "'PingFang SC'", "'Microsoft YaHei'", 'sans-serif'],
+          },
+          boxShadow: {
+            card: '0 1px 3px rgba(0,0,0,0.06)',
+            frame: '0 0 0 1px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.08)',
+          },
+          borderRadius: {
+            DEFAULT: '8px',
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    .mobile-frame {
+      width: 375px;
+      min-height: 100vh;
+      margin: 0 auto;
+      background: #FAFAFA;
+      position: relative;
+      overflow-x: hidden;
+    }
+    @media (min-width: 376px) {
+      body { background: #E8ECF0; }
+      .mobile-frame {
+        margin-top: 24px;
+        margin-bottom: 24px;
+        min-height: calc(100vh - 48px);
+        border-radius: 24px;
+        box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 4px 24px rgba(0,0,0,0.08);
+        overflow: hidden;
+      }
+    }
+    .input-field {
+      height: 44px;
+      border: 1px solid #C8CAD1;
+      border-radius: 8px;
+      padding: 0 12px;
+      font-size: 14px;
+      color: #3C444F;
+      background: #FFFFFF;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-field:focus {
+      border-color: #3087CC;
+      box-shadow: 0 0 0 2px rgba(48,135,204,0.15);
+    }
+    .input-field:read-only {
+      background: #F5F5F7;
+      color: #9096A2;
+    }
+    select.input-field {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239096A2' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+    .radio-group label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #3C444F;
+      cursor: pointer;
+    }
+    .radio-group input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #3087CC;
+    }
+    textarea.input-field {
+      height: auto;
+      min-height: 100px;
+      padding: 12px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body class="font-sans text-txt-primary">
+
+<div class="mobile-frame flex flex-col pb-20">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-white border-b border-border flex items-center h-11 px-4 flex-shrink-0">
+    <a href="app-application-detail.html" class="flex items-center gap-1 text-txt-primary text-sm">
+      <i class="fa-solid fa-chevron-left text-xs"></i>
+    </a>
+    <span class="flex-1 text-center text-[15px] font-semibold -ml-4">修改申请</span>
+  </header>
+
+  <!-- Scrollable body -->
+  <div class="flex-1 overflow-y-auto px-4 pt-4 pb-6 space-y-4">
+
+    <!-- Rejection reason alert -->
+    <div class="rounded-lg p-3.5 flex gap-3" style="background: #FCE8EA; border: 1px solid #F6BCBE;">
+      <i class="fa-solid fa-circle-exclamation text-error mt-0.5 text-[15px] flex-shrink-0"></i>
+      <div>
+        <div class="text-sm font-semibold text-error mb-1">驳回原因</div>
+        <div class="text-[13px] text-txt-primary leading-relaxed">学生情况描述不够详细，请补充具体症状表现和持续时间</div>
+      </div>
+    </div>
+
+    <!-- Section 1: 学生基本信息 -->
+    <div class="bg-card rounded-lg shadow-card p-4">
+      <h3 class="text-[15px] font-semibold text-txt-primary mb-4 flex items-center gap-2">
+        <span class="w-[3px] h-4 rounded-sm bg-primary inline-block"></span>
+        学生基本信息
+      </h3>
+
+      <div class="space-y-3.5">
+        <!-- 姓名 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">
+            <span class="text-error text-xs mr-0.5">*</span>姓名
+          </label>
+          <input type="text" class="input-field" value="陈静">
+        </div>
+
+        <!-- 性别 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">
+            <span class="text-error text-xs mr-0.5">*</span>性别
+          </label>
+          <div class="radio-group flex gap-6 h-11 items-center">
+            <label><input type="radio" name="gender" value="男"> 男</label>
+            <label><input type="radio" name="gender" value="女" checked> 女</label>
+          </div>
+        </div>
+
+        <!-- 年龄 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">
+            <span class="text-error text-xs mr-0.5">*</span>年龄
+          </label>
+          <input type="number" class="input-field" value="20">
+        </div>
+
+        <!-- 学院 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">
+            <span class="text-error text-xs mr-0.5">*</span>学院
+          </label>
+          <select class="input-field">
+            <option>请选择学院</option>
+            <option>计算机学院</option>
+            <option>商学院</option>
+            <option selected>外国语学院</option>
+            <option>文学与新闻传播学院</option>
+            <option>法学院</option>
+            <option>数学与统计学院</option>
+            <option>物理与电子学院</option>
+            <option>化学化工学院</option>
+            <option>材料科学与工程学院</option>
+            <option>机电工程学院</option>
+          </select>
+        </div>
+
+        <!-- 年级 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">
+            <span class="text-error text-xs mr-0.5">*</span>年级
+          </label>
+          <select class="input-field">
+            <option>请选择年级</option>
+            <option>大一</option>
+            <option selected>大二</option>
+            <option>大三</option>
+            <option>大四</option>
+            <option>研一</option>
+            <option>研二</option>
+            <option>研三</option>
+            <option>博一</option>
+            <option>博二</option>
+            <option>博三</option>
+          </select>
+        </div>
+
+        <!-- 身份证号 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">
+            <span class="text-error text-xs mr-0.5">*</span>身份证号
+          </label>
+          <input type="text" class="input-field" value="430XXXXXXXXXXXXX">
+        </div>
+
+        <!-- 联系方式 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">
+            <span class="text-error text-xs mr-0.5">*</span>联系方式
+          </label>
+          <input type="tel" class="input-field" value="17712345678">
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 2: 辅导员信息 -->
+    <div class="bg-card rounded-lg shadow-card p-4">
+      <h3 class="text-[15px] font-semibold text-txt-primary mb-4 flex items-center gap-2">
+        <span class="w-[3px] h-4 rounded-sm bg-primary inline-block"></span>
+        辅导员信息
+      </h3>
+
+      <div class="space-y-3.5">
+        <!-- 就诊类型 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">
+            <span class="text-error text-xs mr-0.5">*</span>就诊类型
+          </label>
+          <div class="radio-group flex gap-6 h-11 items-center">
+            <label><input type="radio" name="visitType" value="首诊" checked> 首诊</label>
+            <label><input type="radio" name="visitType" value="复诊"> 复诊</label>
+          </div>
+        </div>
+
+        <!-- 辅导员姓名 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">辅导员姓名</label>
+          <input type="text" class="input-field" value="张老师" readonly>
+        </div>
+
+        <!-- 辅导员联系方式 -->
+        <div>
+          <label class="text-sm text-txt-secondary mb-1.5 block">辅导员联系方式</label>
+          <input type="tel" class="input-field" value="13812345678" readonly>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 3: 学生情况说明 (highlighted) -->
+    <div class="bg-card rounded-lg shadow-card p-4" style="border: 1px solid #F29100;">
+      <h3 class="text-[15px] font-semibold text-txt-primary mb-3 flex items-center gap-2">
+        <span class="w-[3px] h-4 rounded-sm bg-primary inline-block"></span>
+        学生情况说明
+      </h3>
+
+      <!-- Yellow hint -->
+      <div class="rounded-md px-3 py-2 mb-3 flex items-center gap-2 text-[13px]" style="background: #FFF5E5; color: #F29100;">
+        <i class="fa-solid fa-triangle-exclamation text-xs"></i>
+        请根据驳回原因修改此部分
+      </div>
+
+      <div>
+        <label class="text-sm text-txt-secondary mb-1.5 block">
+          <span class="text-error text-xs mr-0.5">*</span>情况描述
+        </label>
+        <div class="relative">
+          <textarea
+            id="descTextarea"
+            class="input-field"
+            maxlength="150"
+            style="border-left: 3px solid #F29100; padding-left: 14px;"
+            oninput="updateCount()"
+          >该生近期情绪低落，食欲下降，睡眠质量差</textarea>
+          <div class="text-right mt-1.5 text-xs text-txt-muted">
+            <span id="charCount">20</span>/150
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom fixed bar -->
+  <div class="fixed bottom-0 left-1/2 -translate-x-1/2 w-[375px] bg-white border-t border-border px-4 py-3 z-30 space-y-2">
+    <button
+      class="w-full h-11 rounded-lg text-white font-medium text-sm active:scale-[0.98] transition-transform"
+      style="background: #3087CC;"
+    >
+      重新提交
+    </button>
+    <div class="text-center pb-1">
+      <a href="../index.html" class="text-xs text-primary hover:underline inline-flex items-center gap-1">
+        <i class="fa-solid fa-arrow-left text-[10px]"></i>
+        返回原型导航
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function updateCount() {
+    const textarea = document.getElementById('descTextarea');
+    document.getElementById('charCount').textContent = textarea.value.length;
+  }
+</script>
+<!-- 返回原型首页 -->
+<a href="../index.html" style="position:fixed;left:16px;bottom:16px;z-index:9999;width:36px;height:36px;background:#3087CC;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(48,135,204,0.3);color:#fff;font-size:14px;text-decoration:none;transition:transform .2s;" title="返回原型首页" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'"><i class="fa-solid fa-house"></i></a>
+</body>
+</html>
